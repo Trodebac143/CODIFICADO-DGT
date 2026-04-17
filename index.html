@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta Infracciones DGT</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 16px;
+      max-width: 900px;
+    }
+
+    h1 {
+      margin-bottom: 12px;
+    }
+
+    .bloque {
+      margin-bottom: 14px;
+    }
+
+    .fila-botones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    button {
+      padding: 10px 14px;
+      font-size: 15px;
+      cursor: pointer;
+      border: 1px solid #999;
+      background: #f3f3f3;
+      border-radius: 8px;
+    }
+
+    button.activo {
+      background: #dbeafe;
+      border-color: #2563eb;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      max-width: 500px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #999;
+      border-radius: 8px;
+    }
+
+    .acciones {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .resultado {
+      margin-top: 18px;
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background: #fafafa;
+      white-space: pre-wrap;
+    }
+
+    .titulo-resultado {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .alerta {
+      margin-top: 8px;
+      padding: 8px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .alerta-penal {
+      background: #fee2e2;
+      border: 1px solid #ef4444;
+    }
+
+    .alerta-inmo {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+    }
+
+    .secundario {
+      color: #444;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Modo Patrulla DGT</h1>
+
+  <div class="bloque">
+    <strong>Materia</strong>
+    <div class="fila-botones" id="botonesMateria">
+      <button type="button" onclick="seleccionar('materia','SEGURO',this)">SEGURO</button>
+      <button type="button" onclick="seleccionar('materia','PERMISO',this)">PERMISO</button>
+      <button type="button" onclick="seleccionar('materia','DROGAS',this)">DROGAS</button>
+      <button type="button" onclick="seleccionar('materia','ALCOHOL',this)">ALCOHOL</button>
+    </div>
+  </div>
+
+  <div class="bloque">
+    <strong>Vehículo</strong>
+    <div class="fila-botones" id="botonesVehiculo">
+      <button type="button" onclick="seleccionar('vehiculo','TURISMO',this)">TURISMO</button>
+      <button type="button" onclick="seleccionar('vehiculo','MOTOCICLETA',this)">MOTOCICLETA</button>
+      <button type="button" onclick="seleccionar('vehiculo','CICLOMOTOR',this)">CICLOMOTOR</button>
+      <button type="button" onclick="seleccionar('vehiculo','TODOS',this)">TODOS</button>
+    </div>
+  </div>
+
+  <div class="bloque">
+    <strong>Situación</strong>
+    <div class="fila-botones" id="botonesSituacion">
+      <button type="button" onclick="seleccionar('situacion','CIRCULANDO',this)">CIRCULANDO</button>
+      <button type="button" onclick="seleccionar('situacion','NO CIRCULANDO',this)">NO CIRCULANDO</button>
+    </div>
+  </div>
+
+  <div class="bloque">
+    <strong>Descripción breve opcional</strong><br>
+    <input type="text" id="texto" placeholder="Ej: sin seguro turismo, moto sin seguro, alcohol 0.60">
+  </div>
+
+  <div class="acciones">
+    <button type="button" onclick="buscar()">Buscar</button>
+    <button type="button" onclick="limpiarTodo()">Limpiar</button>
+  </div>
+
+  <div id="resultado" class="resultado">Esperando consulta...</div>
+
+  <script>
+    const URL = "BASE_INFRACCIONES.csv";
+
+    let estado = {
+      materia: "",
+      vehiculo: "",
+      situacion: ""
+    };
+
+    function seleccionar(campo, valor, boton) {
+      estado[campo] = valor;
+
+      let contenedorId = "";
+      if (campo === "materia") contenedorId = "botonesMateria";
+      if (campo === "vehiculo") contenedorId = "botonesVehiculo";
+      if (campo === "situacion") contenedorId = "botonesSituacion";
+
+      const botones = document.querySelectorAll(`#${contenedorId} button`);
+      botones.forEach(b => b.classList.remove("activo"));
+      boton.classList.add("activo");
+    }
+
+    function limpiarTodo() {
+      estado = {
+        materia: "",
+        vehiculo: "",
+        situacion: ""
+      };
+
+      document.getElementById("texto").value = "";
+      document.querySelectorAll("button.activo").forEach(b => b.classList.remove("activo"));
+      document.getElementById("resultado").innerHTML = "Esperando consulta...";
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+
+        if (char === '"') {
+          if (inQuotes && line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === "," && !inQuotes) {
+          result.push(current);
+          current = "";
+        } else {
+          current += char;
+        }
+      }
+
+      result.push(current);
+      return result;
+    }
+
+    async function cargarDatos() {
+      const res = await fetch(URL, { method: "GET" });
+      if (!res.ok) {
+        throw new Error("No se pudo leer el CSV. HTTP " + res.status);
+      }
+
+      const text = await res.text();
+      const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
+      if (lines.length < 2) {
+        throw new Error("El CSV está vacío o no tiene datos.");
+      }
+
+      const headers = parseCSVLine(lines[0]).map(h => h.trim());
+
+      return lines.slice(1).map(line => {
+        const values = parseCSVLine(line);
+        const obj = {};
+        headers.forEach((h, i) => {
+          obj[h] = (values[i] || "").trim();
+        });
+        return obj;
+      });
+    }
+
+    function normalizarTexto(texto) {
+      return texto
+        .toLowerCase()
+        .replaceAll("vehículo", "")
+        .replaceAll("vehiculo", "")
+        .replaceAll("coche", "turismo")
+        .replaceAll("moto", "motocicleta")
+        .replaceAll("sin carnet", "nunca obtuvo permiso")
+        .replaceAll("carnet", "permiso")
+        .replaceAll(/\s+/g, " ")
+        .trim();
+    }
+
+    function puntuarFila(r, textoNormalizado) {
+      let score = 0;
+      const palabras = textoNormalizado ? textoNormalizado.split(" ") : [];
+      const claves = (r.palabras_clave || "").toLowerCase();
+      const submateria = (r.submateria || "").toLowerCase();
+      const literal = (r.texto_literal || "").toLowerCase();
+
+      palabras.forEach(p => {
+        if (p && claves.includes(p)) score += 3;
+        if (p && submateria.includes(p)) score += 2;
+        if (p && literal.includes(p)) score += 1;
+      });
+
+      if (estado.materia && r.submateria === estado.materia) score += 20;
+      if (estado.vehiculo && (r.vehiculo_tipo === estado.vehiculo || r.vehiculo_tipo === "TODOS")) score += 10;
+      if (estado.situacion && r.situacion === estado.situacion) score += 10;
+
+      return score;
+    }
+
+    async function buscar() {
+      const div = document.getElementById("resultado");
+      div.textContent = "Buscando...";
+
+      try {
+        const data = await cargarDatos();
+        const textoUsuario = document.getElementById("texto").value;
+        const texto = normalizarTexto(textoUsuario);
+
+        let candidatos = data.filter(r => {
+          if (estado.materia && r.submateria !== estado.materia) return false;
+          if (estado.vehiculo && r.vehiculo_tipo !== estado.vehiculo && r.vehiculo_tipo !== "TODOS") return false;
+          if (estado.situacion && r.situacion !== estado.situacion) return false;
+          return true;
+        });
+
+        if (candidatos.length === 0) {
+          candidatos = data;
+        }
+
+        const puntuados = candidatos
+          .map(r => ({ ...r, score: puntuarFila(r, texto) }))
+          .sort((a, b) => b.score - a.score);
+
+        const mejores = puntuados.filter(r => r.score > 0).slice(0, 3);
+
+        if (mejores.length === 0) {
+          div.innerHTML = "Sin resultados.";
+          return;
+        }
+
+        const r = mejores[0];
+
+        let html = `
+<div class="titulo-resultado">${r.norma} ${r.articulo}.${r.apartado} ${r.opcion}</div>
+<div><strong>Texto:</strong> ${r.texto_literal}</div>
+<div><strong>Calificación:</strong> ${r.calificacion}</div>
+<div><strong>Puntos:</strong> ${r.puntos}</div>
+<div><strong>Importe:</strong> ${r.importe} €</div>
+<div><strong>Importe reducido:</strong> ${r.importe_reducido} €</div>
+<div><strong>Responsable:</strong> ${r.responsable}</div>
+`;
+
+        if (r.inmovilizacion_procede === "SI") {
+          html += `<div class="alerta alerta-inmo">Inmovilización: SÍ${r.inmovilizacion_base ? " (" + r.inmovilizacion_base + ")" : ""}</div>`;
+        } else {
+          html += `<div class="secundario"><strong>Inmovilización:</strong> NO</div>`;
+        }
+
+        if (r.alerta_penal === "SI") {
+          html += `<div class="alerta alerta-penal">Posible relevancia penal: ${r.referencia_penal || "Sí"}</div>`;
+        }
+
+        if (r.comentario_operativo && r.comentario_operativo !== "—") {
+          html += `<div class="secundario"><strong>Comentario operativo:</strong> ${r.comentario_operativo}</div>`;
+        }
+
+        if (r.accion_prioritaria && r.accion_prioritaria !== "—") {
+          html += `<div class="secundario"><strong>Acción prioritaria:</strong> ${r.accion_prioritaria}</div>`;
+        }
+
+        if (mejores.length > 1) {
+          html += `<hr><div><strong>Otras sugerencias:</strong></div>`;
+          mejores.slice(1).forEach(s => {
+            html += `<div class="secundario">${s.norma} ${s.articulo}.${s.apartado} ${s.opcion} — ${s.texto_literal}</div>`;
+          });
+        }
+
+        div.innerHTML = html;
+
+      } catch (error) {
+        div.innerHTML = `Error: ${error.message}`;
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>
