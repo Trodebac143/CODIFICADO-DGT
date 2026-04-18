@@ -277,7 +277,6 @@
           <button type="button" onclick="seleccionar('vehiculo','MOTOCICLETA',this)">MOTOCICLETA</button>
           <button type="button" onclick="seleccionar('vehiculo','CICLOMOTOR',this)">CICLOMOTOR</button>
           <button type="button" onclick="seleccionar('vehiculo','3ª CATEGORÍA',this)">3ª CATEGORÍA</button>
-          <button type="button" onclick="seleccionar('vehiculo','TODOS',this)">TODOS</button>
         </div>
       </div>
 
@@ -449,7 +448,7 @@
       });
 
       if (estado.materia && r.submateria === estado.materia) score += 25;
-      if (estado.vehiculo && (r.vehiculo_tipo === estado.vehiculo || r.vehiculo_tipo === "TODOS" || r.vehiculo_tipo === "—")) score += 12;
+      if (estado.vehiculo && (r.vehiculo_tipo === estado.vehiculo || r.vehiculo_tipo === "—")) score += 12;
       if (estado.situacion && r.situacion === estado.situacion) score += 12;
 
       if (estado.vehiculo === "3ª CATEGORÍA" && r.submateria === "SEGURO" && r.vehiculo_tipo === "3ª CATEGORÍA") {
@@ -505,7 +504,7 @@
 
         let candidatos = data.filter(r => {
           if (estado.materia && r.submateria !== estado.materia) return false;
-          if (estado.vehiculo && r.vehiculo_tipo !== estado.vehiculo && r.vehiculo_tipo !== "TODOS" && r.vehiculo_tipo !== "—") return false;
+          if (estado.vehiculo && r.vehiculo_tipo !== estado.vehiculo && r.vehiculo_tipo !== "—") return false;
           if (estado.situacion && r.situacion !== estado.situacion) return false;
           return true;
         });
