@@ -212,6 +212,8 @@
       line-height: 1.45;
     }
 
+    .oculto { display: none; }
+
     hr {
       border: 0;
       border-top: 1px solid #e2e8f0;
@@ -219,36 +221,13 @@
     }
 
     @media (max-width: 640px) {
-      body {
-        padding: 10px;
-      }
-
-      .panel {
-        padding: 12px;
-        border-radius: 20px;
-      }
-
-      .bloque {
-        padding: 12px;
-        border-radius: 16px;
-      }
-
-      .fila-botones {
-        gap: 7px;
-      }
-
-      .fila-botones button {
-        flex: 1 1 calc(50% - 7px);
-      }
-
-      .acciones {
-        grid-template-columns: 1fr;
-      }
-
-      .resultado {
-        padding: 14px;
-        border-radius: 16px;
-      }
+      body { padding: 10px; }
+      .panel { padding: 12px; border-radius: 20px; }
+      .bloque { padding: 12px; border-radius: 16px; }
+      .fila-botones { gap: 7px; }
+      .fila-botones button { flex: 1 1 calc(50% - 7px); }
+      .acciones { grid-template-columns: 1fr; }
+      .resultado { padding: 14px; border-radius: 16px; }
     }
   </style>
 </head>
@@ -288,9 +267,18 @@
         </div>
       </div>
 
+      <div class="bloque" id="bloqueGrupoAlcohol">
+        <strong>Grupo alcohol</strong>
+        <div class="fila-botones" id="botonesGrupoAlcohol">
+          <button type="button" onclick="seleccionar('grupoAlcohol','GENERAL',this)">GENERAL</button>
+          <button type="button" onclick="seleccionar('grupoAlcohol','ESPECIAL',this)">NÓVEL / PROF.</button>
+          <button type="button" onclick="seleccionar('grupoAlcohol','REINCIDENTE',this)">REINCIDENTE</button>
+        </div>
+      </div>
+
       <div class="bloque input-wrap">
         <strong>Descripción breve opcional</strong>
-        <input type="text" id="texto" placeholder="Ej: sin seguro turismo, moto sin seguro, alcohol 0.60">
+        <input type="text" id="texto" placeholder="Ej: sin seguro turismo, alcohol 0.66, alcohol profesional 0.32, negativa drogas">
       </div>
 
       <div class="acciones">
@@ -308,8 +296,20 @@
     let estado = {
       materia: "",
       vehiculo: "",
-      situacion: ""
+      situacion: "",
+      grupoAlcohol: ""
     };
+
+    function actualizarVisibilidadAlcohol() {
+      const bloque = document.getElementById("bloqueGrupoAlcohol");
+      if (estado.materia === "ALCOHOL") {
+        bloque.classList.remove("oculto");
+      } else {
+        bloque.classList.add("oculto");
+        estado.grupoAlcohol = "";
+        document.querySelectorAll("#botonesGrupoAlcohol button").forEach(b => b.classList.remove("activo"));
+      }
+    }
 
     function seleccionar(campo, valor, boton) {
       estado[campo] = valor;
@@ -318,22 +318,27 @@
       if (campo === "materia") contenedorId = "botonesMateria";
       if (campo === "vehiculo") contenedorId = "botonesVehiculo";
       if (campo === "situacion") contenedorId = "botonesSituacion";
+      if (campo === "grupoAlcohol") contenedorId = "botonesGrupoAlcohol";
 
       const botones = document.querySelectorAll(`#${contenedorId} button`);
       botones.forEach(b => b.classList.remove("activo"));
       boton.classList.add("activo");
+
+      if (campo === "materia") actualizarVisibilidadAlcohol();
     }
 
     function limpiarTodo() {
       estado = {
         materia: "",
         vehiculo: "",
-        situacion: ""
+        situacion: "",
+        grupoAlcohol: ""
       };
 
       document.getElementById("texto").value = "";
       document.querySelectorAll("button.activo").forEach(b => b.classList.remove("activo"));
       document.getElementById("resultado").innerHTML = "Esperando consulta...";
+      actualizarVisibilidadAlcohol();
     }
 
     function parseCSVLine(line) {
@@ -365,15 +370,11 @@
 
     async function cargarDatos() {
       const res = await fetch(URL, { method: "GET" });
-      if (!res.ok) {
-        throw new Error("No se pudo leer el CSV. HTTP " + res.status);
-      }
+      if (!res.ok) throw new Error("No se pudo leer el CSV. HTTP " + res.status);
 
       const text = await res.text();
       const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
-      if (lines.length < 2) {
-        throw new Error("El CSV está vacío o no tiene datos.");
-      }
+      if (lines.length < 2) throw new Error("El CSV está vacío o no tiene datos.");
 
       const headers = parseCSVLine(lines[0]).map(h => h.trim());
 
@@ -402,13 +403,25 @@
         .replaceAll("pesado", " 3ª categoría ")
         .replaceAll("trailer", " 3ª categoría ")
         .replaceAll("tráiler", " 3ª categoría ")
-        .replaceAll("sin carnet", " nunca obtuvo permiso ")
+        .replaceAll("sin carnet", " sin permiso nunca obtenido ")
         .replaceAll("carnet", " permiso ")
         .replaceAll("rehusarse", " negativa ")
         .replaceAll("rehusar", " negativa ")
         .replaceAll("negarse", " negativa ")
+        .replaceAll("profesionales", " profesional ")
+        .replaceAll("noveles", " novel ")
+        .replaceAll("novel", " novel ")
+        .replaceAll("reincidencia", " reincidente ")
         .replaceAll(/\s+/g, " ")
         .trim();
+    }
+
+    function formatearValor(v) {
+      if (v === null || v === undefined) return "—";
+      const s = String(v).trim();
+      if (!s) return "—";
+      if (/^\d+(\.0+)?$/.test(s)) return String(parseInt(parseFloat(s), 10));
+      return s;
     }
 
     function extraerNumeroAlcohol(texto) {
@@ -417,19 +430,103 @@
       return parseFloat(m[1].replace(",", "."));
     }
 
-    function esConsultaAlcohol(texto, estadoMateria) {
-      return estadoMateria === "ALCOHOL" || /\balcohol\b|\betilometr|\bmg\/l\b|\bgramos?\b|\btasa\b/.test(texto);
+    function esConsultaAlcohol(texto, materia) {
+      return materia === "ALCOHOL" || /\balcohol\b|\betilometr|\btasa\b|\bmg\/l\b|\bgr\/l\b|\bsangre\b|\baire\b/.test(texto);
     }
 
-    function esConsultaDrogas(texto, estadoMateria) {
-      return estadoMateria === "DROGAS" || /\bdroga|\bdrogas\b|\bdrogotest\b|\bsaliva\b/.test(texto);
+    function esConsultaDrogas(texto, materia) {
+      return materia === "DROGAS" || /\bdroga\b|\bdrogas\b|\bdrogotest\b|\bsaliva\b/.test(texto);
     }
 
     function esNegativa(texto) {
       return /\bnegativa\b|\bno someterse\b|\bnegarse\b/.test(texto);
     }
 
-    function puntuarFila(r, textoNormalizado) {
+    function esEspecialAlcohol(texto, grupo) {
+      if (grupo === "ESPECIAL") return true;
+      return /\bprofesional\b|\bnovel\b|\burgencia\b|\bmercancias peligrosas\b|\bmercancías peligrosas\b|\btransporte especial\b/.test(texto);
+    }
+
+    function esReincidenteAlcohol(texto, grupo) {
+      if (grupo === "REINCIDENTE") return true;
+      return /\breincidente\b|\bantecedente\b|\bsancion firme\b|\bsanción firme\b/.test(texto);
+    }
+
+    function esSangre(texto) {
+      return /\bsangre\b|\bg\/l\b|\bgramos?\b/.test(texto);
+    }
+
+    function esAire(texto) {
+      return /\baire\b|\bmg\/l\b|\betilomet/.test(texto);
+    }
+
+    function inferirVehiculoDesdeTexto(texto) {
+      if (/\b3ª categoría\b/.test(texto)) return "3ª CATEGORÍA";
+      if (/\bmotocicleta\b/.test(texto)) return "MOTOCICLETA";
+      if (/\bciclomotor\b/.test(texto)) return "CICLOMOTOR";
+      if (/\bturismo\b/.test(texto)) return "TURISMO";
+      return "";
+    }
+
+    function getWildcardVehiculo(v) {
+      return v === "—" || v === "TODOS" || !v;
+    }
+
+    function resolverAlcohol(data, texto) {
+      const alcoholRows = data.filter(r => r.submateria === "ALCOHOL");
+      if (alcoholRows.length === 0) return null;
+
+      if (esNegativa(texto)) {
+        return alcoholRows.find(r => r.norma === "CIR" && formatearValor(r.articulo) === "021" && r.opcion === "5F") || null;
+      }
+
+      const numero = extraerNumeroAlcohol(texto);
+      const especial = esEspecialAlcohol(texto, estado.grupoAlcohol);
+      const reincidente = esReincidenteAlcohol(texto, estado.grupoAlcohol);
+      const sangre = esSangre(texto) && !esAire(texto);
+
+      let opcion = "";
+
+      if (reincidente) {
+        if (especial) {
+          opcion = sangre ? "5O" : "5Ñ";
+        } else {
+          opcion = sangre ? "5N" : "5M";
+        }
+      } else {
+        if (especial) {
+          if (sangre) {
+            opcion = (numero !== null && numero > 0.60) ? "5L" : "5H";
+          } else {
+            opcion = (numero !== null && numero > 0.30) ? "5K" : "5G";
+          }
+        } else {
+          if (sangre) {
+            opcion = (numero !== null && numero > 1.00) ? "5J" : "5F";
+          } else {
+            opcion = (numero !== null && numero > 0.50) ? "5I" : "5E";
+          }
+        }
+      }
+
+      return alcoholRows.find(r => r.opcion === opcion) || null;
+    }
+
+    function resolverDrogas(data, texto) {
+      const drogasRows = data.filter(r => r.submateria === "DROGAS");
+      if (drogasRows.length === 0) return null;
+
+      if (esNegativa(texto)) {
+        if (/\baccidente\b|\binfraccion\b|\binfracción\b|\busuario\b/.test(texto)) {
+          return drogasRows.find(r => formatearValor(r.articulo) === "014" && formatearValor(r.apartado) === "2" && r.opcion === "5C") || null;
+        }
+        return drogasRows.find(r => formatearValor(r.articulo) === "014" && formatearValor(r.apartado) === "2" && r.opcion === "5A") || null;
+      }
+
+      return drogasRows.find(r => formatearValor(r.articulo) === "014" && formatearValor(r.apartado) === "1" && r.opcion === "5A") || null;
+    }
+
+    function puntuarFila(r, textoNormalizado, vehiculoInferido) {
       let score = 0;
       const palabras = textoNormalizado ? textoNormalizado.split(" ") : [];
       const claves = (r.palabras_clave || "").toLowerCase();
@@ -448,40 +545,39 @@
       });
 
       if (estado.materia && r.submateria === estado.materia) score += 25;
-      if (estado.vehiculo && (r.vehiculo_tipo === estado.vehiculo || r.vehiculo_tipo === "—")) score += 12;
+
+      const vehiculoActivo = estado.vehiculo || vehiculoInferido;
+      if (vehiculoActivo && (r.vehiculo_tipo === vehiculoActivo || getWildcardVehiculo(r.vehiculo_tipo))) score += 12;
       if (estado.situacion && r.situacion === estado.situacion) score += 12;
 
-      if (estado.vehiculo === "3ª CATEGORÍA" && r.submateria === "SEGURO" && r.vehiculo_tipo === "3ª CATEGORÍA") {
-        score += 25;
-      }
-
-      if (esNegativa(textoNormalizado)) {
-        if ((esConsultaAlcohol(textoNormalizado, estado.materia) && r.norma === "CIR" && r.articulo === "021" && r.opcion === "5F") ||
-            (esConsultaDrogas(textoNormalizado, estado.materia) && r.submateria === "DROGAS" && r.alerta_penal === "SI")) {
-          score += 100;
-        }
-      }
+      if (vehiculoActivo === "3ª CATEGORÍA" && r.submateria === "SEGURO" && r.vehiculo_tipo === "3ª CATEGORÍA") score += 25;
 
       return score;
     }
 
     function aplicarReglasOperativas(r, textoNormalizado) {
       const numero = extraerNumeroAlcohol(textoNormalizado);
+      const consultaAlcohol = esConsultaAlcohol(textoNormalizado, estado.materia);
+      const consultaDrogas = esConsultaDrogas(textoNormalizado, estado.materia);
+
       let penalOperativo = false;
       let referenciaPenal = r.referencia_penal || "";
       let accion = r.accion_prioritaria || "";
       let comentario = r.comentario_operativo || "";
 
-      if (esNegativa(textoNormalizado) && (esConsultaAlcohol(textoNormalizado, estado.materia) || esConsultaDrogas(textoNormalizado, estado.materia))) {
+      if (esNegativa(textoNormalizado) && (consultaAlcohol || consultaDrogas)) {
         penalOperativo = true;
         referenciaPenal = "CP 383";
-        accion = "Tramitar diligencias penales y adoptar medidas sobre el vehículo";
+        accion = "Tramitar diligencias penales e inmovilizar el vehículo";
       }
 
-      if (esConsultaAlcohol(textoNormalizado, estado.materia) && numero !== null && numero >= 0.66) {
-        penalOperativo = true;
-        referenciaPenal = "CP 379.2";
-        accion = "Valorar vía penal por tasa penal y tramitar diligencias si procede";
+      if (consultaAlcohol && numero !== null) {
+        const sangre = esSangre(textoNormalizado) && !esAire(textoNormalizado);
+        if ((!sangre && numero > 0.65) || (sangre && numero > 1.10)) {
+          penalOperativo = true;
+          referenciaPenal = "CP 379.2";
+          accion = "Valorar vía penal por tasa penal e inmovilizar el vehículo";
+        }
       }
 
       return {
@@ -501,23 +597,37 @@
         const data = await cargarDatos();
         const textoUsuario = document.getElementById("texto").value;
         const texto = normalizarTexto(textoUsuario);
+        const vehiculoInferido = inferirVehiculoDesdeTexto(texto);
+
+        let resultadoDirecto = null;
+        if (esConsultaAlcohol(texto, estado.materia)) {
+          resultadoDirecto = resolverAlcohol(data, texto);
+        } else if (esConsultaDrogas(texto, estado.materia)) {
+          resultadoDirecto = resolverDrogas(data, texto);
+        }
 
         let candidatos = data.filter(r => {
           if (estado.materia && r.submateria !== estado.materia) return false;
-          if (estado.vehiculo && r.vehiculo_tipo !== estado.vehiculo && r.vehiculo_tipo !== "—") return false;
+
+          const vehiculoActivo = estado.vehiculo || vehiculoInferido;
+          if (vehiculoActivo && r.vehiculo_tipo !== vehiculoActivo && !getWildcardVehiculo(r.vehiculo_tipo)) return false;
+
           if (estado.situacion && r.situacion !== estado.situacion) return false;
           return true;
         });
 
-        if (candidatos.length === 0) {
-          candidatos = data;
-        }
+        if (candidatos.length === 0) candidatos = data;
 
         const puntuados = candidatos
-          .map(r => ({ ...r, score: puntuarFila(r, texto) }))
+          .map(r => ({ ...r, score: puntuarFila(r, texto, vehiculoInferido) }))
           .sort((a, b) => b.score - a.score);
 
-        const mejores = puntuados.filter(r => r.score > 0).slice(0, 3);
+        let mejores = puntuados.filter(r => r.score > 0).slice(0, 3);
+
+        if (resultadoDirecto) {
+          const resto = puntuados.filter(r => r.id !== resultadoDirecto.id).slice(0, 2);
+          mejores = [resultadoDirecto, ...resto];
+        }
 
         if (mejores.length === 0) {
           div.innerHTML = "Sin resultados.";
@@ -527,12 +637,12 @@
         const r = aplicarReglasOperativas(mejores[0], texto);
 
         let html = `
-<div class="titulo-resultado">${r.norma} ${r.articulo}.${r.apartado} ${r.opcion}</div>
+<div class="titulo-resultado">${r.norma} ${formatearValor(r.articulo)}.${formatearValor(r.apartado)} ${r.opcion}</div>
 <div><strong>Texto:</strong> ${r.texto_literal}</div>
 <div><strong>Calificación:</strong> ${r.calificacion}</div>
-<div><strong>Puntos:</strong> ${r.puntos}</div>
-<div><strong>Importe:</strong> ${r.importe} €</div>
-<div><strong>Importe reducido:</strong> ${r.importe_reducido} €</div>
+<div><strong>Puntos:</strong> ${formatearValor(r.puntos)}</div>
+<div><strong>Importe:</strong> ${formatearValor(r.importe)} €</div>
+<div><strong>Importe reducido:</strong> ${formatearValor(r.importe_reducido)} €</div>
 <div><strong>Responsable:</strong> ${r.responsable}</div>
 `;
 
@@ -557,7 +667,7 @@
         if (mejores.length > 1) {
           html += `<hr><div><strong>Otras sugerencias:</strong></div>`;
           mejores.slice(1).forEach(s => {
-            html += `<div class="secundario">${s.norma} ${s.articulo}.${s.apartado} ${s.opcion} — ${s.texto_literal}</div>`;
+            html += `<div class="secundario">${s.norma} ${formatearValor(s.articulo)}.${formatearValor(s.apartado)} ${s.opcion} — ${s.texto_literal}</div>`;
           });
         }
 
@@ -568,6 +678,8 @@
         console.error(error);
       }
     }
+
+    actualizarVisibilidadAlcohol();
   </script>
 </body>
 </html>
