@@ -548,12 +548,116 @@ function normalizarTexto(texto){
     .replaceAll(/\s+/g," ")
     .trim();
 }
+
+function cloneRecordById(id){
+  const rec = manualRows.find(r => r.id === String(id));
+  return rec ? {...rec} : null;
+}
+function extractFirstDecimal(txt){
+  const m = txt.match(/(\d+[.,]\d+|\d+)/);
+  if(!m) return null;
+  return parseFloat(m[1].replace(",", "."));
+}
+function resolveManualAlcohol(txt){
+  if(!txt.includes("alcohol") && !txt.includes("alcoholem") && !txt.includes("tasa")) return null;
+
+  const isNegative = (txt.includes("negativa") || txt.includes("negar")) &&
+                     (txt.includes("prueba") || txt.includes("etilometro") || txt.includes("alcoholem"));
+  if(isNegative){
+    const rec = cloneRecordById(37);
+    if(rec){
+      rec.alerta_penal = "SI";
+      rec.referencia_penal = "CP 383";
+      rec.accion_prioritaria = "Tramitar diligencias penales y adoptar medidas sobre el vehículo";
+      rec.comentario_operativo = "La negativa a la prueba de alcohol tiene reproche penal.";
+    }
+    return rec;
+  }
+
+  const value = extractFirstDecimal(txt);
+  if(value === null) return null;
+
+  const isBlood = txt.includes("sangre") || txt.includes("gr/l") || txt.includes("g/l");
+  const isProfessional = txt.includes("profesional") || txt.includes("profesionales") ||
+                         txt.includes("novel") || txt.includes("noveles") ||
+                         txt.includes("mercancias peligrosas") || txt.includes("transporte especial") ||
+                         txt.includes("transportes especiales") || txt.includes("urgencia");
+  const isReincidente = txt.includes("reincidente");
+  const hasAccident = txt.includes("accidente") || txt.includes("infraccion");
+
+  let rec = null;
+
+  if(isBlood){
+    if(!isProfessional){
+      if(isReincidente){
+        rec = cloneRecordById(30); // general reincidente sangre >0,50
+      } else {
+        rec = value > 1.00 ? cloneRecordById(28) : cloneRecordById(26);
+      }
+    } else {
+      if(isReincidente){
+        rec = cloneRecordById(36); // novel/prof reincidente sangre >0,30
+      } else {
+        rec = value > 0.60 ? cloneRecordById(34) : cloneRecordById(32);
+      }
+    }
+    if(rec && value >= 1.10){
+      rec.alerta_penal = "SI";
+      rec.referencia_penal = "CP 379.2";
+      rec.accion_prioritaria = "Tramitar diligencias penales por tasa penal y adoptar medidas sobre el vehículo";
+      rec.comentario_operativo = "Tasa penal en sangre desde 1,10 o superior, según criterio operativo fijado.";
+    } else if(rec && hasAccident && value >= 0.40){
+      rec.alerta_penal = "SI";
+      rec.referencia_penal = "Valorar CP 379.2 por influencia";
+      rec.accion_prioritaria = "Valorar diligencias penales por influencia según sintomatología, accidente o infracción";
+      rec.comentario_operativo = "No hay penal automático, pero debe valorarse la influencia en la conducción.";
+    }
+    return rec;
+  }
+
+  // Aire espirado por defecto si no se especifica sangre
+  if(!isProfessional){
+    if(isReincidente){
+      rec = cloneRecordById(29); // general reincidente aire >0,25
+    } else {
+      rec = value > 0.50 ? cloneRecordById(27) : cloneRecordById(25);
+    }
+  } else {
+    if(isReincidente){
+      rec = cloneRecordById(35); // novel/prof reincidente aire >0,15
+    } else {
+      rec = value > 0.30 ? cloneRecordById(33) : cloneRecordById(31);
+    }
+  }
+
+  if(rec && value >= 0.66){
+    rec.alerta_penal = "SI";
+    rec.referencia_penal = "CP 379.2";
+    rec.accion_prioritaria = "Tramitar diligencias penales por tasa penal y adoptar medidas sobre el vehículo";
+    rec.comentario_operativo = "Tasa penal en aire espirado desde 0,66 o superior, según criterio operativo fijado.";
+  } else if(rec && hasAccident && value >= 0.40){
+    rec.alerta_penal = "SI";
+    rec.referencia_penal = "Valorar CP 379.2 por influencia";
+    rec.accion_prioritaria = "Valorar diligencias penales por influencia según sintomatología, accidente o infracción";
+    rec.comentario_operativo = "No hay penal automático, pero debe valorarse la influencia en la conducción.";
+  }
+  return rec;
+}
+
+
 function manualSearch(){
   const txt = normalizarTexto(document.getElementById("manualInput").value || "");
   if(!txt){
     renderResult(null);
     return;
   }
+
+  const alcoholResolved = resolveManualAlcohol(txt);
+  if(alcoholResolved){
+    renderResult(alcoholResolved, "MANUAL");
+    return;
+  }
+
   const words = txt.split(" ").filter(Boolean);
   const scored = manualRows.map(r=>{
     const hay = `${r.submateria||""} ${r.palabras_clave||""} ${r.texto_literal||""} ${r.comentario_operativo||""}`.toLowerCase();
