@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,11 +6,10 @@
   <title>Consulta Infracciones DGT</title>
   <style>
     :root{
-      --bg1:#0f172a; --bg2:#1e293b; --card:#ffffff; --soft:#f8fafc; --line:#dbe3ee;
+      --bg1:#0f172a; --bg2:#1e293b; --soft:#f8fafc; --line:#dbe3ee;
       --text:#0f172a; --muted:#475569; --primary:#1d4ed8; --primary-strong:#1e40af;
-      --primary-soft:#dbeafe; --warn:#f59e0b; --warn-bg:#fef3c7; --danger:#dc2626;
-      --danger-bg:#fee2e2; --ok:#065f46; --ok-bg:#d1fae5; --radius:18px;
-      --shadow:0 14px 34px rgba(15,23,42,.18);
+      --primary-soft:#dbeafe; --warn-bg:#fef3c7; --danger-bg:#fee2e2; --ok-bg:#d1fae5;
+      --radius:18px; --shadow:0 14px 34px rgba(15,23,42,.18);
     }
     *{box-sizing:border-box}
     body{
@@ -26,7 +24,6 @@
     .panel{background:rgba(255,255,255,.96);border:1px solid rgba(255,255,255,.45);border-radius:24px;padding:14px;box-shadow:var(--shadow)}
     .section{background:var(--soft);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
     .section h2{margin:0 0 10px;font-size:1rem;color:#1e293b}
-    .section h3{margin:0 0 8px;font-size:.92rem;color:#334155}
     .row{display:flex;flex-wrap:wrap;gap:8px}
     .stack{display:flex;flex-direction:column;gap:10px}
     button{
@@ -35,15 +32,11 @@
     }
     button:hover{transform:translateY(-1px)} button:active{transform:none}
     button.active{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 10px 22px rgba(29,78,216,.26)}
-    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    button.secondaryLink{background:#eff6ff;border-style:dashed;color:var(--primary-strong)}
+    .actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
     .actions button{border-radius:14px}
     .actions .primary{background:var(--primary); color:#fff; border-color:var(--primary)}
     .actions .primary:hover{background:var(--primary-strong)}
-    .manual input{
-      width:100%;padding:13px 14px;font-size:16px;border:1px solid var(--line);border-radius:14px;outline:none;background:#fff
-    }
-    .manual input:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(29,78,216,.12)}
-    .hint{font-size:.88rem;color:var(--muted);margin-top:6px}
     .step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px}
     .step-title{font-weight:700;margin-bottom:8px}
     .path{font-size:.9rem;color:var(--muted)}
@@ -56,7 +49,8 @@
     .alert.inmo{background:var(--warn-bg);border:1px solid #fcd34d;color:#92400e}
     .badge{display:inline-block;padding:7px 10px;border-radius:999px;font-size:.82rem;font-weight:700;margin:0 6px 8px 0;border:1px solid transparent}
     .badge.blue{background:var(--primary-soft); color:var(--primary-strong); border-color:#bfdbfe}
-    .badge.green{background:var(--ok-bg); color:var(--ok); border-color:#6ee7b7}
+    .badge.green{background:var(--ok-bg); color:#065f46; border-color:#6ee7b7}
+    .note{font-size:.88rem;color:var(--muted);margin-top:6px}
     @media (max-width:680px){
       .row button{flex:1 1 calc(50% - 8px)}
       .actions{grid-template-columns:1fr}
@@ -67,7 +61,7 @@
 <div class="app">
   <div class="hero">
     <h1>Modo Patrulla DGT</h1>
-    <p>Consulta cerrada por árboles de decisión, con apoyo opcional de búsqueda manual.</p>
+    <p>Consulta cerrada por árbol de decisiones.</p>
   </div>
 
   <div class="panel">
@@ -82,18 +76,11 @@
       </div>
     </div>
 
-    <div class="section manual">
-      <h2>Búsqueda manual secundaria</h2>
-      <input id="manualInput" type="text" placeholder="Escribe una conducta si quieres buscar manualmente">
-      <div class="hint">El árbol tiene prioridad. La búsqueda libre queda como apoyo.</div>
-    </div>
-
     <div id="treeArea" class="stack"></div>
 
     <div class="actions">
       <button class="primary" id="btnResolver" type="button">Resolver</button>
       <button id="btnVolver" type="button">Volver</button>
-      <button id="btnBuscarManual" type="button">Buscar manual</button>
       <button id="btnLimpiar" type="button">Limpiar</button>
     </div>
 
@@ -103,21 +90,20 @@
 
 <script>
 const URL = "BASE_INFRACCIONES.csv";
-let manualRows = [];
+let records = [];
 
 const state = {
   materia: "",
   history: [],
-  alcohol: {grupo:"", reincidente:"", medio:"", supuesto:""},
+  alcohol: {grupo:"", medio:"", supuesto:"", reincidente:""},
   drogas: {supuesto:""},
   soa: {vehiculo:"", circula:""},
   itv: {estado:"", detalle:""},
-  permisos: {tipo:"", detalle:""}
+  permisos: {tipo:"", detalle:"", judicial:"", judicialPena:""}
 };
 
-function cleanRows(rows){
-  return rows.filter(r => r && r.id);
-}
+function cleanRows(rows){ return rows.filter(r => r && r.id); }
+
 function parseCSVLine(line){
   const result=[]; let current=""; let inQuotes=false;
   for(let i=0;i<line.length;i++){
@@ -132,6 +118,7 @@ function parseCSVLine(line){
   result.push(current);
   return result;
 }
+
 async function loadCSV(){
   try{
     const res = await fetch(URL,{method:"GET"});
@@ -147,29 +134,33 @@ async function loadCSV(){
       return obj;
     });
     return cleanRows(rows);
-  }catch(e){
-    return [];
-  }
+  }catch(e){ return []; }
 }
-function resetAll(){
+
+function resetState(){
   state.materia = "";
   state.history = [];
-  state.alcohol = {grupo:"", reincidente:"", medio:"", supuesto:""};
+  state.alcohol = {grupo:"", medio:"", supuesto:"", reincidente:""};
   state.drogas = {supuesto:""};
   state.soa = {vehiculo:"", circula:""};
   state.itv = {estado:"", detalle:""};
-  state.permisos = {tipo:"", detalle:""};
-  document.getElementById("manualInput").value = "";
+  state.permisos = {tipo:"", detalle:"", judicial:"", judicialPena:""};
+}
+
+function resetAll(){
+  resetState();
   document.querySelectorAll("#materiaRow button").forEach(b=>b.classList.remove("active"));
   document.getElementById("treeArea").innerHTML = "";
   document.getElementById("resultado").innerHTML = "Selecciona una materia para empezar.";
 }
+
 function activateMatterButton(materia){
   document.querySelectorAll("#materiaRow button").forEach(b=>{
     b.classList.toggle("active", b.dataset.materia === materia);
   });
 }
-function pushHistory(){
+
+function saveSnapshot(){
   state.history.push(JSON.stringify({
     materia: state.materia,
     alcohol: state.alcohol,
@@ -179,6 +170,7 @@ function pushHistory(){
     permisos: state.permisos
   }));
 }
+
 function goBack(){
   if(!state.history.length) return;
   const prev = JSON.parse(state.history.pop());
@@ -191,18 +183,20 @@ function goBack(){
   activateMatterButton(state.materia);
   renderTree();
 }
+
 function selectMatter(materia){
-  pushHistory();
+  saveSnapshot();
   state.materia = materia;
-  state.alcohol = {grupo:"", reincidente:"", medio:"", supuesto:""};
+  state.alcohol = {grupo:"", medio:"", supuesto:"", reincidente:""};
   state.drogas = {supuesto:""};
   state.soa = {vehiculo:"", circula:""};
   state.itv = {estado:"", detalle:""};
-  state.permisos = {tipo:"", detalle:""};
+  state.permisos = {tipo:"", detalle:"", judicial:"", judicialPena:""};
   activateMatterButton(materia);
   renderTree();
   document.getElementById("resultado").innerHTML = "Completa el árbol y pulsa Resolver.";
 }
+
 document.querySelectorAll("#materiaRow button").forEach(btn=>{
   btn.addEventListener("click", ()=> selectMatter(btn.dataset.materia));
 });
@@ -224,12 +218,34 @@ function makeStep(title, options, current, onPick){
   wrap.appendChild(row);
   return wrap;
 }
+
 function renderPath(text){
   const el = document.createElement("div");
   el.className = "path";
   el.textContent = text;
   return el;
 }
+
+function makeExternalLinkStep(){
+  const wrap = document.createElement("div");
+  wrap.className = "step";
+  wrap.innerHTML = `<div class="step-title">Consulta oficial</div>`;
+  const row = document.createElement("div");
+  row.className = "row";
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "secondaryLink";
+  b.textContent = "CONSULTAR PAÍSES CON CONVENIO";
+  b.onclick = ()=> window.open("https://www.dgt.es/nuestros-servicios/permisos-de-conducir/permisos-extranjeros-y-de-fuerzas-y-cuerpos-de-seguridad/canjes-de-permisos/paises-con-convenio-de-canjes/", "_blank");
+  row.appendChild(b);
+  wrap.appendChild(row);
+  const note = document.createElement("div");
+  note.className = "note";
+  note.textContent = "Abre el listado oficial DGT en una pestaña nueva.";
+  wrap.appendChild(note);
+  return wrap;
+}
+
 function renderTree(){
   const area = document.getElementById("treeArea");
   area.innerHTML = "";
@@ -237,67 +253,61 @@ function renderTree(){
 
   if(state.materia === "ALCOHOL"){
     area.appendChild(makeStep("1. Grupo", ["CONDUCTORES EN GENERAL", "NÓVELES / PROFESIONALES"], state.alcohol.grupo, (opt)=>{
-      pushHistory();
-      state.alcohol.grupo = opt;
-      state.alcohol.reincidente = "";
-      state.alcohol.medio = "";
-      state.alcohol.supuesto = "";
+      saveSnapshot();
+      state.alcohol = {grupo:opt, medio:"", supuesto:"", reincidente:""};
       renderTree();
     }));
+
     if(state.alcohol.grupo){
-      area.appendChild(makeStep("2. ¿Reincidente?", ["SÍ","NO"], state.alcohol.reincidente, (opt)=>{
-        pushHistory();
-        state.alcohol.reincidente = opt;
-        state.alcohol.medio = "";
-        state.alcohol.supuesto = "";
-        renderTree();
-      }));
-    }
-    if(state.alcohol.reincidente){
-      area.appendChild(makeStep("3. Medio", ["AIRE ESPIRADO", "SANGRE", "ACCIDENTE / INFRACCIÓN", "NEGATIVA A REALIZAR PRUEBA"], state.alcohol.medio, (opt)=>{
-        pushHistory();
+      area.appendChild(makeStep("2. Tipo", ["AIRE ESPIRADO", "SANGRE", "0,40 + ACCIDENTE / INFRACCIÓN", "NEGATIVA A REALIZAR PRUEBA"], state.alcohol.medio, (opt)=>{
+        saveSnapshot();
         state.alcohol.medio = opt;
         state.alcohol.supuesto = "";
+        state.alcohol.reincidente = "";
         renderTree();
       }));
     }
+
     if(state.alcohol.medio){
       const general = state.alcohol.grupo === "CONDUCTORES EN GENERAL";
-      const rein = state.alcohol.reincidente === "SÍ";
+      let options = [];
+      if(state.alcohol.medio === "AIRE ESPIRADO"){
+        options = general
+          ? ["> 0,25 y < 0,50", "> 0,50 y < 0,66", "0,66 o superior"]
+          : ["> 0,15 y < 0,30", "> 0,30 y < 0,66", "0,66 o superior"];
+      } else if(state.alcohol.medio === "SANGRE"){
+        options = general
+          ? ["> 0,50 y < 1,00", "> 1,00 y < 1,10", "1,10 o superior"]
+          : ["> 0,30 y < 0,60", "> 0,60 y < 1,10", "1,10 o superior"];
+      }
 
-      // Negativa: se resuelve ya en el paso 3. No necesita paso 4 y no depende realmente del grupo/reincidencia.
-      if(state.alcohol.medio === "NEGATIVA A REALIZAR PRUEBA"){
-        state.alcohol.supuesto = "Negativa a realizar prueba";
-        area.appendChild(renderPath(`Ruta: ALCOHOL → ${state.alcohol.grupo || "—"} → ${state.alcohol.reincidente || "—"} → NEGATIVA A REALIZAR PRUEBA`));
-      } else {
-        let options = [];
-        if(state.alcohol.medio === "AIRE ESPIRADO"){
-          if(general && !rein) options = ["> 0,25 y < 0,50", "> 0,50 y < 0,66", "0,66 o superior"];
-          if(general && rein) options = ["> 0,25 y < 0,66", "0,66 o superior"];
-          if(!general && !rein) options = ["> 0,15 y < 0,30", "> 0,30 y < 0,66", "0,66 o superior"];
-          if(!general && rein) options = ["> 0,15 y < 0,66", "0,66 o superior"];
-        } else if(state.alcohol.medio === "SANGRE"){
-          if(general && !rein) options = ["> 0,50 y < 1,00", "> 1,00 y < 1,10", "1,10 o superior"];
-          if(general && rein) options = ["> 0,50 y < 1,10", "1,10 o superior"];
-          if(!general && !rein) options = ["> 0,30 y < 0,60", "> 0,60 y < 1,10", "1,10 o superior"];
-          if(!general && rein) options = ["> 0,30 y < 1,10", "1,10 o superior"];
-        } else if(state.alcohol.medio === "ACCIDENTE / INFRACCIÓN"){
-          options = ["0,40 + accidente / infracción"];
-        }
-
-        area.appendChild(makeStep("4. Supuesto", options, state.alcohol.supuesto, (opt)=>{
-          pushHistory();
+      if(options.length){
+        area.appendChild(makeStep("3. Tramo", options, state.alcohol.supuesto, (opt)=>{
+          saveSnapshot();
           state.alcohol.supuesto = opt;
+          state.alcohol.reincidente = "";
           renderTree();
         }));
-        area.appendChild(renderPath(`Ruta: ALCOHOL → ${state.alcohol.grupo || "—"} → ${state.alcohol.reincidente || "—"} → ${state.alcohol.medio || "—"} → ${state.alcohol.supuesto || "—"}`));
+      } else {
+        state.alcohol.supuesto = state.alcohol.medio;
       }
     }
+
+    const needsReincidence = ["AIRE ESPIRADO","SANGRE"].includes(state.alcohol.medio) && !!state.alcohol.supuesto;
+    if(needsReincidence){
+      area.appendChild(makeStep("4. ¿Reincidente?", ["SÍ","NO"], state.alcohol.reincidente, (opt)=>{
+        saveSnapshot();
+        state.alcohol.reincidente = opt;
+        renderTree();
+      }));
+    }
+
+    area.appendChild(renderPath(`Ruta: ALCOHOL → ${state.alcohol.grupo || "—"} → ${state.alcohol.medio || "—"} → ${state.alcohol.supuesto || "—"}${needsReincidence ? " → " + (state.alcohol.reincidente || "—") : ""}`));
   }
 
   if(state.materia === "DROGAS"){
     area.appendChild(makeStep("1. Supuesto", ["POSITIVO", "NEGATIVA A REALIZAR PRUEBA"], state.drogas.supuesto, (opt)=>{
-      pushHistory();
+      saveSnapshot();
       state.drogas.supuesto = opt;
       renderTree();
     }));
@@ -306,14 +316,14 @@ function renderTree(){
 
   if(state.materia === "SOA"){
     area.appendChild(makeStep("1. Vehículo", ["CICLOMOTOR","MOTOCICLETA","TURISMO","3ª CATEGORÍA"], state.soa.vehiculo, (opt)=>{
-      pushHistory();
+      saveSnapshot();
       state.soa.vehiculo = opt;
       state.soa.circula = "";
       renderTree();
     }));
     if(state.soa.vehiculo){
       area.appendChild(makeStep("2. ¿Circula?", ["SÍ","NO"], state.soa.circula, (opt)=>{
-        pushHistory();
+        saveSnapshot();
         state.soa.circula = opt;
         renderTree();
       }));
@@ -323,21 +333,21 @@ function renderTree(){
 
   if(state.materia === "ITV"){
     area.appendChild(makeStep("1. Estado ITV", ["CADUCADA","DESFAVORABLE","NEGATIVA"], state.itv.estado, (opt)=>{
-      pushHistory();
+      saveSnapshot();
       state.itv.estado = opt;
       state.itv.detalle = "";
       renderTree();
     }));
     if(state.itv.estado === "DESFAVORABLE"){
       area.appendChild(makeStep("2. Detalle", ["CIRCULANDO", "FUERA DE PLAZO"], state.itv.detalle, (opt)=>{
-        pushHistory();
+        saveSnapshot();
         state.itv.detalle = opt;
         renderTree();
       }));
     }
     if(state.itv.estado === "NEGATIVA"){
       area.appendChild(makeStep("2. Detalle", ["CIRCULANDO", "PONER EN CIRCULACIÓN"], state.itv.detalle, (opt)=>{
-        pushHistory();
+        saveSnapshot();
         state.itv.detalle = opt;
         renderTree();
       }));
@@ -347,159 +357,174 @@ function renderTree(){
 
   if(state.materia === "PERMISOS"){
     area.appendChild(makeStep("1. Tipo", ["CADUCADO","SIN PERMISO","PERMISO NO VÁLIDO"], state.permisos.tipo, (opt)=>{
-      pushHistory();
-      state.permisos.tipo = opt;
-      state.permisos.detalle = "";
+      saveSnapshot();
+      state.permisos = {tipo:opt, detalle:"", judicial:"", judicialPena:""};
       renderTree();
     }));
+
     if(state.permisos.tipo === "SIN PERMISO"){
-      area.appendChild(makeStep("2. Detalle", ["NUNCA OBTENIDO","PÉRDIDA TOTAL DE PUNTOS","PRIVACIÓN JUDICIAL","OTRO SUPUESTO ADMINISTRATIVO"], state.permisos.detalle, (opt)=>{
-        pushHistory();
+      area.appendChild(makeStep("2. Detalle", ["NUNCA OBTENIDO","PÉRDIDA TOTAL DE PUNTOS","PRIVACIÓN JUDICIAL"], state.permisos.detalle, (opt)=>{
+        saveSnapshot();
         state.permisos.detalle = opt;
+        state.permisos.judicial = "";
+        state.permisos.judicialPena = "";
         renderTree();
       }));
+
+      if(state.permisos.detalle === "PRIVACIÓN JUDICIAL"){
+        area.appendChild(makeStep("3. Situación", ["DENTRO DEL PLAZO DE PENA","FUERA DEL PLAZO DE PENA"], state.permisos.judicial, (opt)=>{
+          saveSnapshot();
+          state.permisos.judicial = opt;
+          state.permisos.judicialPena = "";
+          renderTree();
+        }));
+
+        if(state.permisos.judicial === "FUERA DEL PLAZO DE PENA"){
+          area.appendChild(makeStep("4. Duración de la pena", ["PENA < 2 AÑOS","PENA DE 2 AÑOS O MÁS"], state.permisos.judicialPena, (opt)=>{
+            saveSnapshot();
+            state.permisos.judicialPena = opt;
+            renderTree();
+          }));
+        }
+      }
     }
+
     if(state.permisos.tipo === "PERMISO NO VÁLIDO"){
       area.appendChild(makeStep("2. Detalle", ["EXTRANJERO CANJEABLE","EXTRANJERO NO CANJEABLE","NO HABILITA PARA ESE VEHÍCULO","INCUMPLIMIENTO DE REQUISITOS ADMINISTRATIVOS"], state.permisos.detalle, (opt)=>{
-        pushHistory();
+        saveSnapshot();
         state.permisos.detalle = opt;
         renderTree();
       }));
+      area.appendChild(makeExternalLinkStep());
     }
-    area.appendChild(renderPath(`Ruta: PERMISOS → ${state.permisos.tipo || "—"} → ${state.permisos.detalle || "—"}`));
+
+    area.appendChild(renderPath(`Ruta: PERMISOS → ${state.permisos.tipo || "—"} → ${state.permisos.detalle || "—"}${state.permisos.judicial ? " → " + state.permisos.judicial : ""}${state.permisos.judicialPena ? " → " + state.permisos.judicialPena : ""}`));
   }
 }
+
+function findById(id){ return records.find(r => String(r.id) === String(id)) || null; }
 
 function recordFromTree(){
   if(state.materia === "SOA"){
     const map = {
-      "CICLOMOTOR|SÍ":"1", "MOTOCICLETA|SÍ":"2", "TURISMO|SÍ":"3", "3ª CATEGORÍA|SÍ":"4",
-      "CICLOMOTOR|NO":"5", "MOTOCICLETA|NO":"6", "TURISMO|NO":"7", "3ª CATEGORÍA|NO":"8"
+      "CICLOMOTOR|SÍ":"1","MOTOCICLETA|SÍ":"2","TURISMO|SÍ":"3","3ª CATEGORÍA|SÍ":"4",
+      "CICLOMOTOR|NO":"5","MOTOCICLETA|NO":"6","TURISMO|NO":"7","3ª CATEGORÍA|NO":"8"
     };
-    return manualRows.find(r => r.id === map[`${state.soa.vehiculo}|${state.soa.circula}`]) || null;
+    return findById(map[`${state.soa.vehiculo}|${state.soa.circula}`]);
   }
+
   if(state.materia === "DROGAS"){
-    const id = state.drogas.supuesto === "POSITIVO" ? "18" : state.drogas.supuesto === "NEGATIVA A REALIZAR PRUEBA" ? "19" : "";
-    return manualRows.find(r => r.id === id) || null;
+    return findById(state.drogas.supuesto === "POSITIVO" ? "18" : state.drogas.supuesto === "NEGATIVA A REALIZAR PRUEBA" ? "19" : "");
   }
+
   if(state.materia === "ITV"){
-    let id = "";
-    if(state.itv.estado === "CADUCADA") id = "20";
-    if(state.itv.estado === "DESFAVORABLE" && state.itv.detalle === "CIRCULANDO") id = "21";
-    if(state.itv.estado === "DESFAVORABLE" && state.itv.detalle === "FUERA DE PLAZO") id = "22";
-    if(state.itv.estado === "NEGATIVA" && state.itv.detalle === "CIRCULANDO") id = "23";
-    if(state.itv.estado === "NEGATIVA" && state.itv.detalle === "PONER EN CIRCULACIÓN") id = "24";
-    return manualRows.find(r => r.id === id) || null;
+    if(state.itv.estado === "CADUCADA") return findById("20");
+    if(state.itv.estado === "DESFAVORABLE" && state.itv.detalle === "CIRCULANDO") return findById("21");
+    if(state.itv.estado === "DESFAVORABLE" && state.itv.detalle === "FUERA DE PLAZO") return findById("22");
+    if(state.itv.estado === "NEGATIVA" && state.itv.detalle === "CIRCULANDO") return findById("23");
+    if(state.itv.estado === "NEGATIVA" && state.itv.detalle === "PONER EN CIRCULACIÓN") return findById("24");
+    return null;
   }
+
   if(state.materia === "PERMISOS"){
-    let id = "";
-    if(state.permisos.tipo === "CADUCADO") id = "9";
-    if(state.permisos.tipo === "SIN PERMISO" && state.permisos.detalle === "NUNCA OBTENIDO") id = "10";
-    if(state.permisos.tipo === "SIN PERMISO" && state.permisos.detalle === "PÉRDIDA TOTAL DE PUNTOS") id = "11";
-    if(state.permisos.tipo === "SIN PERMISO" && state.permisos.detalle === "PRIVACIÓN JUDICIAL") id = "12";
-    if(state.permisos.tipo === "SIN PERMISO" && state.permisos.detalle === "OTRO SUPUESTO ADMINISTRATIVO") id = "13";
-    if(state.permisos.tipo === "PERMISO NO VÁLIDO" && state.permisos.detalle === "EXTRANJERO CANJEABLE") id = "14";
-    if(state.permisos.tipo === "PERMISO NO VÁLIDO" && state.permisos.detalle === "EXTRANJERO NO CANJEABLE") id = "15";
-    if(state.permisos.tipo === "PERMISO NO VÁLIDO" && state.permisos.detalle === "NO HABILITA PARA ESE VEHÍCULO") id = "16";
-    if(state.permisos.tipo === "PERMISO NO VÁLIDO" && state.permisos.detalle === "INCUMPLIMIENTO DE REQUISITOS ADMINISTRATIVOS") id = "17";
-    return manualRows.find(r => r.id === id) || null;
+    if(state.permisos.tipo === "CADUCADO") return findById("9");
+    if(state.permisos.tipo === "SIN PERMISO" && state.permisos.detalle === "NUNCA OBTENIDO") return findById("10");
+    if(state.permisos.tipo === "SIN PERMISO" && state.permisos.detalle === "PÉRDIDA TOTAL DE PUNTOS") return findById("11");
+    if(state.permisos.tipo === "SIN PERMISO" && state.permisos.detalle === "PRIVACIÓN JUDICIAL" && state.permisos.judicial === "DENTRO DEL PLAZO DE PENA") return findById("12");
+    if(state.permisos.tipo === "SIN PERMISO" && state.permisos.detalle === "PRIVACIÓN JUDICIAL" && state.permisos.judicial === "FUERA DEL PLAZO DE PENA" && state.permisos.judicialPena === "PENA < 2 AÑOS") return findById("13");
+    
+    if(state.permisos.tipo === "SIN PERMISO" && state.permisos.detalle === "PRIVACIÓN JUDICIAL" && state.permisos.judicial === "FUERA DEL PLAZO DE PENA" && state.permisos.judicialPena === "PENA DE 2 AÑOS O MÁS") return findById("38");
+    if(state.permisos.tipo === "PERMISO NO VÁLIDO" && state.permisos.detalle === "EXTRANJERO CANJEABLE") return findById("14");
+    if(state.permisos.tipo === "PERMISO NO VÁLIDO" && state.permisos.detalle === "EXTRANJERO NO CANJEABLE") return findById("15");
+    if(state.permisos.tipo === "PERMISO NO VÁLIDO" && state.permisos.detalle === "NO HABILITA PARA ESE VEHÍCULO") return findById("16");
+    if(state.permisos.tipo === "PERMISO NO VÁLIDO" && state.permisos.detalle === "INCUMPLIMIENTO DE REQUISITOS ADMINISTRATIVOS") return findById("17");
+    return null;
   }
+
   if(state.materia === "ALCOHOL"){
     const g = state.alcohol.grupo;
-    const r = state.alcohol.reincidente;
     const m = state.alcohol.medio;
     const s = state.alcohol.supuesto;
-    let id = "";
+    const r = state.alcohol.reincidente;
 
-    if(m === "NEGATIVA A REALIZAR PRUEBA") id = "37";
+    if(m === "NEGATIVA A REALIZAR PRUEBA") return findById("37");
+    if(m === "0,40 + ACCIDENTE / INFRACCIÓN") return findById(g === "CONDUCTORES EN GENERAL" ? "25" : "31");
 
-    if(g === "CONDUCTORES EN GENERAL" && r === "NO" && m === "AIRE ESPIRADO" && s === "> 0,25 y < 0,50") id = "25";
-    if(g === "CONDUCTORES EN GENERAL" && r === "NO" && m === "AIRE ESPIRADO" && s === "> 0,50 y < 0,66") id = "27";
-    if(g === "CONDUCTORES EN GENERAL" && r === "NO" && m === "AIRE ESPIRADO" && s === "0,66 o superior") id = "27";
-
-    if(g === "CONDUCTORES EN GENERAL" && r === "NO" && m === "SANGRE" && s === "> 0,50 y < 1,00") id = "26";
-    if(g === "CONDUCTORES EN GENERAL" && r === "NO" && m === "SANGRE" && s === "> 1,00 y < 1,10") id = "28";
-    if(g === "CONDUCTORES EN GENERAL" && r === "NO" && m === "SANGRE" && s === "1,10 o superior") id = "28";
-
-    if(g === "CONDUCTORES EN GENERAL" && r === "SÍ" && m === "AIRE ESPIRADO" && s === "> 0,25 y < 0,66") id = "29";
-    if(g === "CONDUCTORES EN GENERAL" && r === "SÍ" && m === "AIRE ESPIRADO" && s === "0,66 o superior") id = "29";
-    if(g === "CONDUCTORES EN GENERAL" && r === "SÍ" && m === "SANGRE" && s === "> 0,50 y < 1,10") id = "30";
-    if(g === "CONDUCTORES EN GENERAL" && r === "SÍ" && m === "SANGRE" && s === "1,10 o superior") id = "30";
-
-    if(g === "NÓVELES / PROFESIONALES" && r === "NO" && m === "AIRE ESPIRADO" && s === "> 0,15 y < 0,30") id = "31";
-    if(g === "NÓVELES / PROFESIONALES" && r === "NO" && m === "AIRE ESPIRADO" && s === "> 0,30 y < 0,66") id = "33";
-    if(g === "NÓVELES / PROFESIONALES" && r === "NO" && m === "AIRE ESPIRADO" && s === "0,66 o superior") id = "33";
-
-    if(g === "NÓVELES / PROFESIONALES" && r === "NO" && m === "SANGRE" && s === "> 0,30 y < 0,60") id = "32";
-    if(g === "NÓVELES / PROFESIONALES" && r === "NO" && m === "SANGRE" && s === "> 0,60 y < 1,10") id = "34";
-    if(g === "NÓVELES / PROFESIONALES" && r === "NO" && m === "SANGRE" && s === "1,10 o superior") id = "34";
-
-    if(g === "NÓVELES / PROFESIONALES" && r === "SÍ" && m === "AIRE ESPIRADO" && s === "> 0,15 y < 0,66") id = "35";
-    if(g === "NÓVELES / PROFESIONALES" && r === "SÍ" && m === "AIRE ESPIRADO" && s === "0,66 o superior") id = "35";
-    if(g === "NÓVELES / PROFESIONALES" && r === "SÍ" && m === "SANGRE" && s === "> 0,30 y < 1,10") id = "36";
-    if(g === "NÓVELES / PROFESIONALES" && r === "SÍ" && m === "SANGRE" && s === "1,10 o superior") id = "36";
-
-    if(m === "ACCIDENTE / INFRACCIÓN" && s === "0,40 + accidente / infracción"){
-      if(g === "CONDUCTORES EN GENERAL") id = (r === "SÍ" ? "29" : "25");
-      if(g === "NÓVELES / PROFESIONALES") id = (r === "SÍ" ? "35" : "31");
+    if(g === "CONDUCTORES EN GENERAL"){
+      if(m === "AIRE ESPIRADO"){
+        if(r === "NO" && s === "> 0,25 y < 0,50") return findById("25");
+        if(r === "NO" && s === "> 0,50 y < 0,66") return findById("27");
+        if(r === "NO" && s === "0,66 o superior") return findById("27");
+        if(r === "SÍ" && s === "> 0,25 y < 0,50") return findById("29");
+        if(r === "SÍ" && s === "> 0,50 y < 0,66") return findById("29");
+        if(r === "SÍ" && s === "0,66 o superior") return findById("29");
+      }
+      if(m === "SANGRE"){
+        if(r === "NO" && s === "> 0,50 y < 1,00") return findById("26");
+        if(r === "NO" && s === "> 1,00 y < 1,10") return findById("28");
+        if(r === "NO" && s === "1,10 o superior") return findById("28");
+        if(r === "SÍ" && s === "> 0,50 y < 1,10") return findById("30");
+        if(r === "SÍ" && s === "1,10 o superior") return findById("30");
+      }
     }
-    return manualRows.find(r => r.id === id) || null;
+
+    if(g === "NÓVELES / PROFESIONALES"){
+      if(m === "AIRE ESPIRADO"){
+        if(r === "NO" && s === "> 0,15 y < 0,30") return findById("31");
+        if(r === "NO" && s === "> 0,30 y < 0,66") return findById("33");
+        if(r === "NO" && s === "0,66 o superior") return findById("33");
+        if(r === "SÍ" && s === "> 0,15 y < 0,30") return findById("35");
+        if(r === "SÍ" && s === "> 0,30 y < 0,66") return findById("35");
+        if(r === "SÍ" && s === "0,66 o superior") return findById("35");
+      }
+      if(m === "SANGRE"){
+        if(r === "NO" && s === "> 0,30 y < 0,60") return findById("32");
+        if(r === "NO" && s === "> 0,60 y < 1,10") return findById("34");
+        if(r === "NO" && s === "1,10 o superior") return findById("34");
+        if(r === "SÍ" && s === "> 0,30 y < 1,10") return findById("36");
+        if(r === "SÍ" && s === "1,10 o superior") return findById("36");
+      }
+    }
   }
+
   return null;
 }
 
 function applyOperationalOverlays(record){
   if(!record) return null;
   const out = {...record};
+
   if(state.materia === "ALCOHOL"){
-    const m = state.alcohol.medio;
-    const s = state.alcohol.supuesto;
-    if(m === "NEGATIVA A REALIZAR PRUEBA"){
+    if(state.alcohol.medio === "NEGATIVA A REALIZAR PRUEBA"){
       out.alerta_penal = "SI";
       out.referencia_penal = "CP 383";
       out.accion_prioritaria = "Tramitar diligencias penales y adoptar medidas sobre el vehículo";
       out.comentario_operativo = "La negativa a la prueba de alcohol tiene reproche penal.";
     }
-    if(s === "0,66 o superior"){
+    if(state.alcohol.medio === "AIRE ESPIRADO" && state.alcohol.supuesto === "0,66 o superior"){
       out.alerta_penal = "SI";
       out.referencia_penal = "CP 379.2";
-      out.accion_prioritaria = "Tramitar diligencias penales por tasa penal y adoptar medidas sobre el vehículo";
-      out.comentario_operativo = "Tasa penal en aire espirado desde 0,66 o superior, según criterio operativo fijado.";
+      out.accion_prioritaria = "Ejercer acción penal y adoptar medidas sobre el vehículo";
+      out.comentario_operativo = "Tasa penal en aire espirado desde 0,66 o superior, con prioridad operativa penal.";
     }
-    if(s === "1,10 o superior"){
+    if(state.alcohol.medio === "SANGRE" && state.alcohol.supuesto === "1,10 o superior"){
       out.alerta_penal = "SI";
       out.referencia_penal = "CP 379.2";
-      out.accion_prioritaria = "Tramitar diligencias penales por tasa penal y adoptar medidas sobre el vehículo";
-      out.comentario_operativo = "Tasa penal en sangre desde 1,10 o superior, según criterio operativo fijado.";
+      out.accion_prioritaria = "Ejercer acción penal y adoptar medidas sobre el vehículo";
+      out.comentario_operativo = "Tasa penal en sangre desde 1,10 o superior, con prioridad operativa penal.";
     }
-    if(m === "ACCIDENTE / INFRACCIÓN"){
+    if(state.alcohol.medio === "0,40 + ACCIDENTE / INFRACCIÓN"){
       out.alerta_penal = "SI";
       out.referencia_penal = "Valorar CP 379.2 por influencia";
       out.accion_prioritaria = "Valorar diligencias penales por influencia según sintomatología, accidente o infracción";
-      out.comentario_operativo = "No hay penal automático, pero debe valorarse la influencia en la conducción.";
+      out.comentario_operativo = "No hay penal automático por el dato aislado, pero debe valorarse la influencia en la conducción.";
     }
   }
-  if(state.materia === "DROGAS" && state.drogas.supuesto === "NEGATIVA A REALIZAR PRUEBA"){
-    out.alerta_penal = "SI";
-    out.referencia_penal = "CP 383";
-    out.accion_prioritaria = "Tramitar diligencias penales y adoptar medidas sobre el vehículo";
-  }
-  if(state.materia === "PERMISOS" && state.permisos.tipo === "SIN PERMISO"){
-    const d = state.permisos.detalle;
-    if(["NUNCA OBTENIDO","PÉRDIDA TOTAL DE PUNTOS","PRIVACIÓN JUDICIAL"].includes(d)){
-      out.alerta_penal = "SI";
-      out.referencia_penal = "CP 384";
-      out.accion_prioritaria = "Valorar diligencias penales por conducción sin permiso en supuesto penal";
-    } else {
-      out.alerta_penal = "NO";
-      out.referencia_penal = "—";
-      out.accion_prioritaria = "Denunciar";
-    }
-  }
+
   return out;
 }
 
-function renderResult(record, mode="ÁRBOL"){
+function renderResult(record){
   const div = document.getElementById("resultado");
   if(!record){
     div.innerHTML = "No hay resultado con la selección actual.";
@@ -508,7 +533,7 @@ function renderResult(record, mode="ÁRBOL"){
   const penal = (record.alerta_penal || "").toUpperCase() === "SI";
   let html = `
     <div class="title">${record.norma} ${record.articulo}.${record.apartado} ${record.opcion}</div>
-    <span class="badge blue">${mode}</span>
+    <span class="badge blue">ÁRBOL</span>
     ${state.materia ? `<span class="badge green">${state.materia}</span>` : ""}
     <div class="field"><strong>Texto:</strong> ${record.texto_literal}</div>
     <div class="field"><strong>Calificación:</strong> ${record.calificacion}</div>
@@ -518,7 +543,7 @@ function renderResult(record, mode="ÁRBOL"){
     <div class="field"><strong>Responsable:</strong> ${record.responsable}</div>
   `;
   if((record.inmovilizacion_procede || "").toUpperCase() === "SI"){
-    html += `<div class="alert inmo">Inmovilización: SÍ${record.inmovilizacion_base ? " (" + record.inmovilizacion_base + ")" : ""}</div>`;
+    html += `<div class="alert inmo">Inmovilización: SÍ${record.inmovilizacion_base && record.inmovilizacion_base !== "—" ? " (" + record.inmovilizacion_base + ")" : ""}</div>`;
   } else {
     html += `<div class="field muted"><strong>Inmovilización:</strong> NO</div>`;
   }
@@ -534,159 +559,28 @@ function renderResult(record, mode="ÁRBOL"){
   div.innerHTML = html;
 }
 
-function normalizarTexto(texto){
-  return texto.toLowerCase()
-    .replaceAll("vehículo"," ")
-    .replaceAll("vehiculo"," ")
-    .replaceAll("coche"," turismo ")
-    .replaceAll("moto"," motocicleta ")
-    .replaceAll("camión"," tercera categoria ")
-    .replaceAll("camion"," tercera categoria ")
-    .replaceAll("autobús"," tercera categoria ")
-    .replaceAll("autobus"," tercera categoria ")
-    .replaceAll("sin carnet"," sin permiso ")
-    .replaceAll(/\s+/g," ")
-    .trim();
-}
-
-function cloneRecordById(id){
-  const rec = manualRows.find(r => r.id === String(id));
-  return rec ? {...rec} : null;
-}
-function extractFirstDecimal(txt){
-  const m = txt.match(/(\d+[.,]\d+|\d+)/);
-  if(!m) return null;
-  return parseFloat(m[1].replace(",", "."));
-}
-function resolveManualAlcohol(txt){
-  if(!txt.includes("alcohol") && !txt.includes("alcoholem") && !txt.includes("tasa")) return null;
-
-  const isNegative = (txt.includes("negativa") || txt.includes("negar")) &&
-                     (txt.includes("prueba") || txt.includes("etilometro") || txt.includes("alcoholem"));
-  if(isNegative){
-    const rec = cloneRecordById(37);
-    if(rec){
-      rec.alerta_penal = "SI";
-      rec.referencia_penal = "CP 383";
-      rec.accion_prioritaria = "Tramitar diligencias penales y adoptar medidas sobre el vehículo";
-      rec.comentario_operativo = "La negativa a la prueba de alcohol tiene reproche penal.";
-    }
-    return rec;
-  }
-
-  const value = extractFirstDecimal(txt);
-  if(value === null) return null;
-
-  const isBlood = txt.includes("sangre") || txt.includes("gr/l") || txt.includes("g/l");
-  const isProfessional = txt.includes("profesional") || txt.includes("profesionales") ||
-                         txt.includes("novel") || txt.includes("noveles") ||
-                         txt.includes("mercancias peligrosas") || txt.includes("transporte especial") ||
-                         txt.includes("transportes especiales") || txt.includes("urgencia");
-  const isReincidente = txt.includes("reincidente");
-  const hasAccident = txt.includes("accidente") || txt.includes("infraccion");
-
-  let rec = null;
-
-  if(isBlood){
-    if(!isProfessional){
-      if(isReincidente){
-        rec = cloneRecordById(30); // general reincidente sangre >0,50
-      } else {
-        rec = value > 1.00 ? cloneRecordById(28) : cloneRecordById(26);
-      }
-    } else {
-      if(isReincidente){
-        rec = cloneRecordById(36); // novel/prof reincidente sangre >0,30
-      } else {
-        rec = value > 0.60 ? cloneRecordById(34) : cloneRecordById(32);
-      }
-    }
-    if(rec && value >= 1.10){
-      rec.alerta_penal = "SI";
-      rec.referencia_penal = "CP 379.2";
-      rec.accion_prioritaria = "Tramitar diligencias penales por tasa penal y adoptar medidas sobre el vehículo";
-      rec.comentario_operativo = "Tasa penal en sangre desde 1,10 o superior, según criterio operativo fijado.";
-    } else if(rec && hasAccident && value >= 0.40){
-      rec.alerta_penal = "SI";
-      rec.referencia_penal = "Valorar CP 379.2 por influencia";
-      rec.accion_prioritaria = "Valorar diligencias penales por influencia según sintomatología, accidente o infracción";
-      rec.comentario_operativo = "No hay penal automático, pero debe valorarse la influencia en la conducción.";
-    }
-    return rec;
-  }
-
-  // Aire espirado por defecto si no se especifica sangre
-  if(!isProfessional){
-    if(isReincidente){
-      rec = cloneRecordById(29); // general reincidente aire >0,25
-    } else {
-      rec = value > 0.50 ? cloneRecordById(27) : cloneRecordById(25);
-    }
-  } else {
-    if(isReincidente){
-      rec = cloneRecordById(35); // novel/prof reincidente aire >0,15
-    } else {
-      rec = value > 0.30 ? cloneRecordById(33) : cloneRecordById(31);
-    }
-  }
-
-  if(rec && value >= 0.66){
-    rec.alerta_penal = "SI";
-    rec.referencia_penal = "CP 379.2";
-    rec.accion_prioritaria = "Tramitar diligencias penales por tasa penal y adoptar medidas sobre el vehículo";
-    rec.comentario_operativo = "Tasa penal en aire espirado desde 0,66 o superior, según criterio operativo fijado.";
-  } else if(rec && hasAccident && value >= 0.40){
-    rec.alerta_penal = "SI";
-    rec.referencia_penal = "Valorar CP 379.2 por influencia";
-    rec.accion_prioritaria = "Valorar diligencias penales por influencia según sintomatología, accidente o infracción";
-    rec.comentario_operativo = "No hay penal automático, pero debe valorarse la influencia en la conducción.";
-  }
-  return rec;
-}
-
-
-function manualSearch(){
-  const txt = normalizarTexto(document.getElementById("manualInput").value || "");
-  if(!txt){
-    renderResult(null);
-    return;
-  }
-
-  const alcoholResolved = resolveManualAlcohol(txt);
-  if(alcoholResolved){
-    renderResult(alcoholResolved, "MANUAL");
-    return;
-  }
-
-  const words = txt.split(" ").filter(Boolean);
-  const scored = manualRows.map(r=>{
-    const hay = `${r.submateria||""} ${r.palabras_clave||""} ${r.texto_literal||""} ${r.comentario_operativo||""}`.toLowerCase();
-    let score = 0;
-    words.forEach(w => { if(hay.includes(w)) score += 3; });
-    return {...r, _score: score};
-  }).sort((a,b)=> b._score - a._score);
-  renderResult(scored[0] && scored[0]._score > 0 ? scored[0] : null, "MANUAL");
-}
-
 function isTreeComplete(){
   if(state.materia === "ALCOHOL"){
-    if(state.alcohol.medio === "NEGATIVA A REALIZAR PRUEBA"){
-      return !!(state.alcohol.grupo && state.alcohol.reincidente && state.alcohol.medio);
-    }
-    return !!(state.alcohol.grupo && state.alcohol.reincidente && state.alcohol.medio && state.alcohol.supuesto);
+    if(!state.alcohol.grupo || !state.alcohol.medio) return false;
+    if(["NEGATIVA A REALIZAR PRUEBA","0,40 + ACCIDENTE / INFRACCIÓN"].includes(state.alcohol.medio)) return true;
+    return !!(state.alcohol.supuesto && state.alcohol.reincidente);
   }
   if(state.materia === "DROGAS") return !!state.drogas.supuesto;
   if(state.materia === "SOA") return !!(state.soa.vehiculo && state.soa.circula);
   if(state.materia === "ITV"){
     if(state.itv.estado === "CADUCADA") return true;
-    if(state.itv.estado === "DESFAVORABLE") return !!state.itv.detalle;
-    if(state.itv.estado === "NEGATIVA") return !!state.itv.detalle;
+    if(state.itv.estado === "DESFAVORABLE" || state.itv.estado === "NEGATIVA") return !!state.itv.detalle;
     return false;
   }
   if(state.materia === "PERMISOS"){
     if(state.permisos.tipo === "CADUCADO") return true;
-    if(state.permisos.tipo === "SIN PERMISO") return !!state.permisos.detalle;
     if(state.permisos.tipo === "PERMISO NO VÁLIDO") return !!state.permisos.detalle;
+    if(state.permisos.tipo === "SIN PERMISO"){
+      if(!state.permisos.detalle) return false;
+      if(state.permisos.detalle !== "PRIVACIÓN JUDICIAL") return true;
+      if(state.permisos.judicial === "DENTRO DEL PLAZO DE PENA") return true;
+      if(state.permisos.judicial === "FUERA DEL PLAZO DE PENA") return !!state.permisos.judicialPena;
+    }
     return false;
   }
   return false;
@@ -698,13 +592,12 @@ document.getElementById("btnResolver").addEventListener("click", ()=>{
     return;
   }
   const rec = applyOperationalOverlays(recordFromTree());
-  renderResult(rec, "ÁRBOL");
+  renderResult(rec);
 });
-document.getElementById("btnBuscarManual").addEventListener("click", manualSearch);
 document.getElementById("btnLimpiar").addEventListener("click", resetAll);
 document.getElementById("btnVolver").addEventListener("click", goBack);
 
-loadCSV().then(rows => { manualRows = rows; });
+loadCSV().then(rows => { records = rows; });
 </script>
 </body>
 </html>
