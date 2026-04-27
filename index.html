@@ -51,6 +51,14 @@
     .badge.blue{background:var(--primary-soft); color:var(--primary-strong); border-color:#bfdbfe}
     .badge.green{background:var(--ok-bg); color:#065f46; border-color:#6ee7b7}
     .note{font-size:.88rem;color:var(--muted);margin-top:6px}
+    .marginWarn{color:#b91c1c;font-style:italic;font-weight:800}
+    .marginTableWrap{overflow-x:auto;margin-top:10px}
+    .marginTable{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+    .marginTable th,.marginTable td{padding:10px 9px;border-bottom:1px solid var(--line);text-align:left;font-size:.92rem}
+    .marginTable th{background:#e0f2fe;color:#0f172a;font-weight:800}
+    .marginTable tr:last-child td{border-bottom:0}
+    .tinyInput{width:100%;border:1px solid #cbd5e1;border-radius:14px;padding:12px;font-size:1rem;background:#fff}
+    .calcBox{margin-top:12px;background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:12px}
     @media (max-width:680px){
       .row button{flex:1 1 calc(50% - 8px)}
       .actions{grid-template-columns:1fr}
@@ -95,7 +103,7 @@ let records = [];
 const state = {
   materia: "",
   history: [],
-  alcohol: {grupo:"", medio:"", supuesto:"", reincidente:""},
+  alcohol: {grupo:"", medio:"", supuesto:"", reincidente:"", vehiculo:""},
   drogas: {supuesto:""},
   soa: {vehiculo:"", circula:""},
   itv: {estado:"", detalle:""},
@@ -140,7 +148,7 @@ async function loadCSV(){
 function resetState(){
   state.materia = "";
   state.history = [];
-  state.alcohol = {grupo:"", medio:"", supuesto:"", reincidente:""};
+  state.alcohol = {grupo:"", medio:"", supuesto:"", reincidente:"", vehiculo:""};
   state.drogas = {supuesto:""};
   state.soa = {vehiculo:"", circula:""};
   state.itv = {estado:"", detalle:""};
@@ -187,7 +195,7 @@ function goBack(){
 function selectMatter(materia){
   saveSnapshot();
   state.materia = materia;
-  state.alcohol = {grupo:"", medio:"", supuesto:"", reincidente:""};
+  state.alcohol = {grupo:"", medio:"", supuesto:"", reincidente:"", vehiculo:""};
   state.drogas = {supuesto:""};
   state.soa = {vehiculo:"", circula:""};
   state.itv = {estado:"", detalle:""};
@@ -246,46 +254,146 @@ function makeExternalLinkStep(){
   return wrap;
 }
 
+function makeMarginAccessStep(){
+  const wrap = document.createElement("div");
+  wrap.className = "step";
+  wrap.innerHTML = `<div class="step-title">Márgenes de error alcohol</div>`;
+  const row = document.createElement("div");
+  row.className = "row";
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "secondaryLink";
+  b.textContent = "📊 CONSULTAR TABLA DE MÁRGENES";
+  b.onclick = showMarginTable;
+  row.appendChild(b);
+  wrap.appendChild(row);
+  const note = document.createElement("div");
+  note.className = "note marginWarn";
+  note.textContent = "Márgenes de error en aplicación de la Orden ICT/155/2020";
+  wrap.appendChild(note);
+  return wrap;
+}
+
+function makeTramoStep(options, current, onPick){
+  const wrap = document.createElement("div");
+  wrap.className = "step";
+  wrap.innerHTML = `<div class="step-title">3. Tramo — <span class="marginWarn">Márgenes de error en aplicación de la Orden ICT/155/2020</span></div>`;
+  const row = document.createElement("div");
+  row.className = "row";
+  options.forEach(opt=>{
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = opt;
+    if(opt === current) b.classList.add("active");
+    b.onclick = ()=> onPick(opt);
+    row.appendChild(b);
+  });
+  wrap.appendChild(row);
+  return wrap;
+}
+
+function valorRealAlcohol(valorMedido){
+  const v = Number(String(valorMedido).replace(",", "."));
+  if(Number.isNaN(v) || v < 0) return null;
+  const real = v < 0.400 ? Math.max(0, v - 0.030) : v * 0.925;
+  return Math.round(real * 100) / 100;
+}
+
+function tramoOrientativo(valorReal){
+  if(valorReal === null) return "Introduce un valor válido.";
+  if(valorReal <= 0) return "Sin tasa corregida apreciable.";
+  if(valorReal <= 0.15) return "Zona 0,15: relevante para novel/profesional o menor.";
+  if(valorReal <= 0.25) return "Por encima de 0,15 y hasta 0,25.";
+  if(valorReal <= 0.50) return "Tramo >0,25 y <=0,50.";
+  if(valorReal <= 0.60) return "Tramo >0,50 y <=0,60.";
+  return "Tramo >0,60: tratar como zona penal en resto de vehículos; en BICIS/VMP/EPAC solo rama administrativa.";
+}
+
+function showMarginTable(){
+  const area = document.getElementById("treeArea");
+  area.innerHTML = `
+    <div class="section">
+      <h2>📊 Tabla rápida de márgenes de error — alcohol en aire</h2>
+      <div class="note marginWarn">Márgenes de error en aplicación de la Orden ICT/155/2020</div>
+      <div class="marginTableWrap">
+        <table class="marginTable">
+          <thead><tr><th>Lectura del aparato</th><th>Valor tras margen de error</th><th>Zona</th><th>Uso práctico</th></tr></thead>
+          <tbody>
+            <tr><td>0,14</td><td>0,11</td><td>🟢 Bajo 0,15</td><td>Por debajo del umbral 0,15</td></tr>
+            <tr><td>0,18</td><td>0,15</td><td>🟡 Umbral 0,15</td><td>Primer valor útil tras margen para novel/profesional</td></tr>
+            <tr><td>0,24</td><td>0,21</td><td>🟢 Bajo 0,25</td><td>No alcanza 0,25 tras margen</td></tr>
+            <tr><td>0,28</td><td>0,25</td><td>🟡 Umbral 0,25</td><td>Primer valor útil para tramo general</td></tr>
+            <tr><td>0,43</td><td>0,40</td><td>🟠 Zona 0,40</td><td>Valorar accidente / infracción / síntomas</td></tr>
+            <tr><td>0,54</td><td>0,50</td><td>🟠 Umbral 0,50</td><td>Último valor dentro de >0,25 y ≤0,50</td></tr>
+            <tr><td>0,55</td><td>0,51</td><td>🟠 Zona >0,50</td><td>Entra en tramo >0,50 y ≤0,60</td></tr>
+            <tr><td>0,65</td><td>0,60</td><td>🔴 Límite 0,60</td><td>No supera 0,60 tras margen: todavía no zona penal por tasa</td></tr>
+            <tr><td>0,66</td><td>0,61</td><td>🔴 Zona >0,60</td><td>Supera 0,60 tras margen: prioridad penal en resto de vehículos</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="calcBox">
+        <div class="step-title">🧮 Calcular valor real aproximado</div>
+        <input id="alcoholCalcInput" class="tinyInput" inputmode="decimal" placeholder="Ejemplo: 0,47">
+        <div class="row" style="margin-top:10px"><button type="button" onclick="calcularMargenAlcohol()">Calcular</button><button type="button" onclick="renderTree()">Volver al árbol</button></div>
+        <div id="alcoholCalcResult" class="note"></div>
+      </div>
+    </div>`;
+}
+
+function calcularMargenAlcohol(){
+  const input = document.getElementById("alcoholCalcInput");
+  const out = document.getElementById("alcoholCalcResult");
+  const real = valorRealAlcohol(input.value);
+  if(real === null){ out.innerHTML = "Valor no válido."; return; }
+  out.innerHTML = `<strong>Valor tras margen de error:</strong> ${String(real.toFixed(2)).replace(".", ",")} mg/l. <br><strong>Criterio:</strong> ${tramoOrientativo(real)}`;
+}
+
 function renderTree(){
   const area = document.getElementById("treeArea");
   area.innerHTML = "";
   if(!state.materia) return;
 
   if(state.materia === "ALCOHOL"){
-    area.appendChild(makeStep("1. Grupo", ["CONDUCTORES EN GENERAL", "NÓVELES / PROFESIONALES"], state.alcohol.grupo, (opt)=>{
+    area.appendChild(makeStep("1. Grupo", ["CONDUCTORES EN GENERAL", "NÓVELES / PROFESIONALES", "MENORES DE EDAD"], state.alcohol.grupo, (opt)=>{
       saveSnapshot();
-      state.alcohol = {grupo:opt, medio:"", supuesto:"", reincidente:""};
+      state.alcohol = {grupo:opt, medio:"", supuesto:"", reincidente:"", vehiculo:""};
       renderTree();
     }));
 
+    area.appendChild(makeMarginAccessStep());
+
     if(state.alcohol.grupo){
-      area.appendChild(makeStep("2. Tipo", ["AIRE ESPIRADO", "SANGRE", "0,40 + ACCIDENTE / INFRACCIÓN", "NEGATIVA A REALIZAR PRUEBA"], state.alcohol.medio, (opt)=>{
+      area.appendChild(makeStep("2. Tipo", ["REALIZA PRUEBA", "0,40 + ACCIDENTE / INFRACCIÓN", "NEGATIVA A REALIZAR PRUEBA"], state.alcohol.medio, (opt)=>{
         saveSnapshot();
         state.alcohol.medio = opt;
         state.alcohol.supuesto = "";
         state.alcohol.reincidente = "";
+        state.alcohol.vehiculo = "";
         renderTree();
       }));
     }
 
     if(state.alcohol.medio){
       const general = state.alcohol.grupo === "CONDUCTORES EN GENERAL";
+      const menores = state.alcohol.grupo === "MENORES DE EDAD";
       let options = [];
-      if(state.alcohol.medio === "AIRE ESPIRADO"){
-        options = general
-          ? ["> 0,25 y < 0,50", "> 0,50 y < 0,66", "0,66 o superior"]
-          : ["> 0,15 y < 0,30", "> 0,30 y < 0,66", "0,66 o superior"];
-      } else if(state.alcohol.medio === "SANGRE"){
-        options = general
-          ? ["> 0,50 y < 1,00", "> 1,00 y < 1,10", "1,10 o superior"]
-          : ["> 0,30 y < 0,60", "> 0,60 y < 1,10", "1,10 o superior"];
+
+      if(state.alcohol.medio === "REALIZA PRUEBA"){
+        if(menores){
+          options = ["> 0 y <= 0,50", "> 0,50 y <= 0,60", "> 0,60"];
+        } else {
+          options = general
+            ? ["> 0,25 y <= 0,50", "> 0,50 y <= 0,60", "> 0,60"]
+            : ["> 0,15 y < 0,30", "> 0,30 y <= 0,60", "> 0,60"];
+        }
       }
 
       if(options.length){
-        area.appendChild(makeStep("3. Tramo", options, state.alcohol.supuesto, (opt)=>{
+        area.appendChild(makeTramoStep(options, state.alcohol.supuesto, (opt)=>{
           saveSnapshot();
           state.alcohol.supuesto = opt;
           state.alcohol.reincidente = "";
+          state.alcohol.vehiculo = "";
           renderTree();
         }));
       } else {
@@ -293,16 +401,31 @@ function renderTree(){
       }
     }
 
-    const needsReincidence = ["AIRE ESPIRADO","SANGRE"].includes(state.alcohol.medio) && !!state.alcohol.supuesto;
+    const needsReincidence = state.alcohol.medio === "REALIZA PRUEBA" && !!state.alcohol.supuesto;
     if(needsReincidence){
       area.appendChild(makeStep("4. ¿Reincidente?", ["SÍ","NO"], state.alcohol.reincidente, (opt)=>{
         saveSnapshot();
         state.alcohol.reincidente = opt;
+        state.alcohol.vehiculo = "";
         renderTree();
       }));
     }
 
-    area.appendChild(renderPath(`Ruta: ALCOHOL → ${state.alcohol.grupo || "—"} → ${state.alcohol.medio || "—"} → ${state.alcohol.supuesto || "—"}${needsReincidence ? " → " + (state.alcohol.reincidente || "—") : ""}`));
+    const needsVehicle = state.alcohol.medio && (
+      ["NEGATIVA A REALIZAR PRUEBA","0,40 + ACCIDENTE / INFRACCIÓN"].includes(state.alcohol.medio) ||
+      (state.alcohol.medio === "REALIZA PRUEBA" && !!state.alcohol.supuesto && !!state.alcohol.reincidente)
+    );
+
+    if(needsVehicle){
+      const vehicleStepNumber = needsReincidence ? "5" : "3";
+      area.appendChild(makeStep(`${vehicleStepNumber}. Vehículo`, ["BICIS / VMP / EPAC", "RESTO DE VEHÍCULOS"], state.alcohol.vehiculo, (opt)=>{
+        saveSnapshot();
+        state.alcohol.vehiculo = opt;
+        renderTree();
+      }));
+    }
+
+    area.appendChild(renderPath(`Ruta: ALCOHOL → ${state.alcohol.grupo || "—"} → ${state.alcohol.medio || "—"} → ${state.alcohol.supuesto || "—"}${needsReincidence ? " → " + (state.alcohol.reincidente || "—") : ""}${needsVehicle ? " → " + (state.alcohol.vehiculo || "—") : ""}`));
   }
 
   if(state.materia === "DROGAS"){
@@ -448,45 +571,45 @@ function recordFromTree(){
     const r = state.alcohol.reincidente;
 
     if(m === "NEGATIVA A REALIZAR PRUEBA") return findById("37");
-    if(m === "0,40 + ACCIDENTE / INFRACCIÓN") return findById(g === "CONDUCTORES EN GENERAL" ? "25" : "31");
+
+    if(m === "0,40 + ACCIDENTE / INFRACCIÓN"){
+      if(g === "MENORES DE EDAD") return findById("39");
+      return findById(g === "CONDUCTORES EN GENERAL" ? "25" : "31");
+    }
+
+    if(g === "MENORES DE EDAD"){
+      if(m === "REALIZA PRUEBA"){
+        if(r === "NO" && s === "> 0 y <= 0,50") return findById("39");
+        if(r === "SÍ" && s === "> 0 y <= 0,50") return findById("40");
+        if(r === "NO" && s === "> 0,50 y <= 0,60") return findById("27");
+        if(r === "SÍ" && s === "> 0,50 y <= 0,60") return findById("29");
+        if(r === "NO" && s === "> 0,60") return findById("27");
+        if(r === "SÍ" && s === "> 0,60") return findById("29");
+      }
+    }
 
     if(g === "CONDUCTORES EN GENERAL"){
-      if(m === "AIRE ESPIRADO"){
-        if(r === "NO" && s === "> 0,25 y < 0,50") return findById("25");
-        if(r === "NO" && s === "> 0,50 y < 0,66") return findById("27");
-        if(r === "NO" && s === "0,66 o superior") return findById("27");
-        if(r === "SÍ" && s === "> 0,25 y < 0,50") return findById("29");
-        if(r === "SÍ" && s === "> 0,50 y < 0,66") return findById("29");
-        if(r === "SÍ" && s === "0,66 o superior") return findById("29");
-      }
-      if(m === "SANGRE"){
-        if(r === "NO" && s === "> 0,50 y < 1,00") return findById("26");
-        if(r === "NO" && s === "> 1,00 y < 1,10") return findById("28");
-        if(r === "NO" && s === "1,10 o superior") return findById("28");
-        if(r === "SÍ" && s === "> 0,50 y < 1,10") return findById("30");
-        if(r === "SÍ" && s === "1,10 o superior") return findById("30");
+      if(m === "REALIZA PRUEBA"){
+        if(r === "NO" && s === "> 0,25 y <= 0,50") return findById("25");
+        if(r === "NO" && s === "> 0,50 y <= 0,60") return findById("27");
+        if(r === "NO" && s === "> 0,60") return findById("27");
+        if(r === "SÍ" && s === "> 0,25 y <= 0,50") return findById("29");
+        if(r === "SÍ" && s === "> 0,50 y <= 0,60") return findById("29");
+        if(r === "SÍ" && s === "> 0,60") return findById("29");
       }
     }
 
     if(g === "NÓVELES / PROFESIONALES"){
-      if(m === "AIRE ESPIRADO"){
+      if(m === "REALIZA PRUEBA"){
         if(r === "NO" && s === "> 0,15 y < 0,30") return findById("31");
-        if(r === "NO" && s === "> 0,30 y < 0,66") return findById("33");
-        if(r === "NO" && s === "0,66 o superior") return findById("33");
+        if(r === "NO" && s === "> 0,30 y <= 0,60") return findById("33");
+        if(r === "NO" && s === "> 0,60") return findById("33");
         if(r === "SÍ" && s === "> 0,15 y < 0,30") return findById("35");
-        if(r === "SÍ" && s === "> 0,30 y < 0,66") return findById("35");
-        if(r === "SÍ" && s === "0,66 o superior") return findById("35");
-      }
-      if(m === "SANGRE"){
-        if(r === "NO" && s === "> 0,30 y < 0,60") return findById("32");
-        if(r === "NO" && s === "> 0,60 y < 1,10") return findById("34");
-        if(r === "NO" && s === "1,10 o superior") return findById("34");
-        if(r === "SÍ" && s === "> 0,30 y < 1,10") return findById("36");
-        if(r === "SÍ" && s === "1,10 o superior") return findById("36");
+        if(r === "SÍ" && s === "> 0,30 y <= 0,60") return findById("35");
+        if(r === "SÍ" && s === "> 0,60") return findById("35");
       }
     }
   }
-
   return null;
 }
 
@@ -495,32 +618,46 @@ function applyOperationalOverlays(record){
   const out = {...record};
 
   if(state.materia === "ALCOHOL"){
+    const isVmpEpac = state.alcohol.vehiculo === "BICIS / VMP / EPAC";
+
+    if(state.alcohol.grupo === "MENORES DE EDAD"){
+      if(state.alcohol.medio === "REALIZA PRUEBA" && state.alcohol.supuesto === "> 0 y <= 0,50"){
+        out.comentario_operativo = "Menor de edad: tasa 0,00 obligatoria. Resultado positivo: infracción administrativa. Márgenes de error en aplicación de la Orden ICT/155/2020.";
+      }
+      if(state.alcohol.medio === "REALIZA PRUEBA" && state.alcohol.supuesto === "> 0,50 y <= 0,60"){
+        out.comentario_operativo = "Menor de edad con tasa superior a 0,50 e inferior a 0,66 mg/l en aire espirado. Infracción administrativa. Márgenes de error en aplicación de la Orden ICT/155/2020.";
+      }
+    }
+
     if(state.alcohol.medio === "NEGATIVA A REALIZAR PRUEBA"){
       out.alerta_penal = "SI";
       out.referencia_penal = "CP 383";
       out.accion_prioritaria = "Tramitar diligencias penales y adoptar medidas sobre el vehículo";
       out.comentario_operativo = "La negativa a la prueba de alcohol tiene reproche penal.";
     }
-    if(state.alcohol.medio === "AIRE ESPIRADO" && state.alcohol.supuesto === "0,66 o superior"){
+
+    if(state.alcohol.medio === "REALIZA PRUEBA" && state.alcohol.supuesto === "> 0,60"){
       out.alerta_penal = "SI";
       out.referencia_penal = "CP 379.2";
       out.accion_prioritaria = "Ejercer acción penal y adoptar medidas sobre el vehículo";
-      out.comentario_operativo = "Tasa penal en aire espirado desde 0,66 o superior, con prioridad operativa penal.";
+      out.comentario_operativo = "Tasa penal en aire espirado desde > 0,60, con prioridad operativa penal. Márgenes de error en aplicación de la Orden ICT/155/2020.";
     }
-    if(state.alcohol.medio === "SANGRE" && state.alcohol.supuesto === "1,10 o superior"){
-      out.alerta_penal = "SI";
-      out.referencia_penal = "CP 379.2";
-      out.accion_prioritaria = "Ejercer acción penal y adoptar medidas sobre el vehículo";
-      out.comentario_operativo = "Tasa penal en sangre desde 1,10 o superior, con prioridad operativa penal.";
-    }
+
     if(state.alcohol.medio === "0,40 + ACCIDENTE / INFRACCIÓN"){
       out.alerta_penal = "SI";
       out.referencia_penal = "Valorar CP 379.2 por influencia";
       out.accion_prioritaria = "Valorar diligencias penales por influencia según sintomatología, accidente o infracción";
       out.comentario_operativo = "No hay penal automático por el dato aislado, pero debe valorarse la influencia en la conducción.";
     }
-  }
 
+    if(isVmpEpac){
+      out.alerta_penal = "NO";
+      out.referencia_penal = "—";
+      out.accion_prioritaria = "Denunciar administrativamente. En BICIS / VMP / EPAC no se contempla vía penal en esta rama de la aplicación.";
+      const baseComment = out.comentario_operativo && out.comentario_operativo !== "—" ? out.comentario_operativo + " " : "";
+      out.comentario_operativo = baseComment + "BICIS / VMP / EPAC: se mantiene solo respuesta administrativa en esta rama.";
+    }
+  }
   return out;
 }
 
@@ -562,9 +699,10 @@ function renderResult(record){
 function isTreeComplete(){
   if(state.materia === "ALCOHOL"){
     if(!state.alcohol.grupo || !state.alcohol.medio) return false;
-    if(["NEGATIVA A REALIZAR PRUEBA","0,40 + ACCIDENTE / INFRACCIÓN"].includes(state.alcohol.medio)) return true;
-    return !!(state.alcohol.supuesto && state.alcohol.reincidente);
+    if(["NEGATIVA A REALIZAR PRUEBA","0,40 + ACCIDENTE / INFRACCIÓN"].includes(state.alcohol.medio)) return !!state.alcohol.vehiculo;
+    return !!(state.alcohol.supuesto && state.alcohol.reincidente && state.alcohol.vehiculo);
   }
+
   if(state.materia === "DROGAS") return !!state.drogas.supuesto;
   if(state.materia === "SOA") return !!(state.soa.vehiculo && state.soa.circula);
   if(state.materia === "ITV"){
