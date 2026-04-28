@@ -4,66 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Consulta Infracciones DGT</title>
-  <style>
-    :root{
-      --bg1:#0f172a; --bg2:#1e293b; --soft:#f8fafc; --line:#dbe3ee;
-      --text:#0f172a; --muted:#475569; --primary:#1d4ed8; --primary-strong:#1e40af;
-      --primary-soft:#dbeafe; --warn-bg:#fef3c7; --danger-bg:#fee2e2; --ok-bg:#d1fae5;
-      --radius:18px; --shadow:0 14px 34px rgba(15,23,42,.18);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;font-family:Arial,sans-serif;color:var(--text);
-      background:radial-gradient(circle at top, rgba(29,78,216,.24), transparent 32%), linear-gradient(180deg,var(--bg1),var(--bg2));
-      min-height:100vh;padding:12px;
-    }
-    .app{max-width:900px;margin:0 auto}
-    .hero{color:#fff;padding:6px 4px 14px}
-    .hero h1{margin:0 0 6px;font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.1}
-    .hero p{margin:0;color:rgba(255,255,255,.82)}
-    .panel{background:rgba(255,255,255,.96);border:1px solid rgba(255,255,255,.45);border-radius:24px;padding:14px;box-shadow:var(--shadow)}
-    .section{background:var(--soft);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
-    .section h2{margin:0 0 10px;font-size:1rem;color:#1e293b}
-    .row{display:flex;flex-wrap:wrap;gap:8px}
-    .stack{display:flex;flex-direction:column;gap:10px}
-    button{
-      appearance:none;border:1px solid #cbd5e1;background:#fff;color:var(--text);border-radius:999px;padding:12px 14px;
-      min-height:44px;font-size:.95rem;font-weight:700;line-height:1;cursor:pointer;transition:.12s ease
-    }
-    button:hover{transform:translateY(-1px)} button:active{transform:none}
-    button.active{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 10px 22px rgba(29,78,216,.26)}
-    button.secondaryLink{background:#eff6ff;border-style:dashed;color:var(--primary-strong)}
-    .actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
-    .actions button{border-radius:14px}
-    .actions .primary{background:var(--primary); color:#fff; border-color:var(--primary)}
-    .actions .primary:hover{background:var(--primary-strong)}
-    .step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px}
-    .step-title{font-weight:700;margin-bottom:8px}
-    .path{font-size:.9rem;color:var(--muted)}
-    .result{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;min-height:120px}
-    .title{font-size:1.14rem;font-weight:800;margin:0 0 12px}
-    .field{margin:0 0 7px;line-height:1.45}
-    .muted{color:var(--muted)}
-    .alert{padding:11px 12px;border-radius:14px;margin-top:10px;font-weight:700;line-height:1.35}
-    .alert.penal{background:var(--danger-bg);border:1px solid #fca5a5;color:#991b1b}
-    .alert.inmo{background:var(--warn-bg);border:1px solid #fcd34d;color:#92400e}
-    .badge{display:inline-block;padding:7px 10px;border-radius:999px;font-size:.82rem;font-weight:700;margin:0 6px 8px 0;border:1px solid transparent}
-    .badge.blue{background:var(--primary-soft); color:var(--primary-strong); border-color:#bfdbfe}
-    .badge.green{background:var(--ok-bg); color:#065f46; border-color:#6ee7b7}
-    .note{font-size:.88rem;color:var(--muted);margin-top:6px}
-    .marginWarn{color:#b91c1c;font-style:italic;font-weight:800}
-    .marginTableWrap{overflow-x:auto;margin-top:10px}
-    .marginTable{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
-    .marginTable th,.marginTable td{padding:10px 9px;border-bottom:1px solid var(--line);text-align:left;font-size:.92rem}
-    .marginTable th{background:#e0f2fe;color:#0f172a;font-weight:800}
-    .marginTable tr:last-child td{border-bottom:0}
-    .tinyInput{width:100%;border:1px solid #cbd5e1;border-radius:14px;padding:12px;font-size:1rem;background:#fff}
-    .calcBox{margin-top:12px;background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:12px}
-    @media (max-width:680px){
-      .row button{flex:1 1 calc(50% - 8px)}
-      .actions{grid-template-columns:1fr}
-    }
-  </style>
+<style>
+:root{--bg:#eef3f8;--surface:#fff;--text:#0f172a;--muted:#475569;--border:#cbd5e1;--border-soft:#e2e8f0;--primary:#1d4ed8;--primary-dark:#173ea8;--primary-soft:#dbeafe;--warn:#b42318;--shadow:0 10px 28px rgba(15,23,42,.08)}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#f8fafc 0%,var(--bg) 100%);color:var(--text);font-size:18px;line-height:1.45}.app{max-width:1120px;margin:0 auto;padding:18px 16px 34px}.hero{background:linear-gradient(135deg,#102a56,#1d4ed8);color:#fff;border-radius:20px;padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.16)}.hero h1{margin:0;font-size:29px}.hero p{margin:5px 0 0;color:#dbeafe;font-size:17px}.panel,.result{background:rgba(255,255,255,.96);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}.panel{margin-bottom:14px}.section{padding:16px;border-bottom:1px solid var(--border-soft)}.section h2{font-size:18px;margin:0 0 12px;color:#172033;text-transform:uppercase;letter-spacing:.04em}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}button{border:1px solid var(--border);background:#fff;border-radius:999px;padding:14px 18px;font-weight:800;font-size:17px;color:#0f172a;cursor:pointer;transition:background .15s,border-color .15s,transform .05s,box-shadow .15s;min-height:52px}button:active{transform:translateY(1px)}button:hover{border-color:#93a4bd;background:#f8fafc}.selected,button.primary{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 6px 14px rgba(29,78,216,.24)}button.primary:hover,.selected:hover{background:var(--primary-dark);border-color:var(--primary-dark)}#materiaRow button[data-materia="VMP"]{margin-left:auto;background:#0f172a;color:#fff;border-color:#0f172a}#materiaRow button[data-materia="VMP"].selected{background:#1d4ed8;border-color:#1d4ed8}.stack{display:flex;flex-direction:column;gap:12px}.step{background:#fff;border:1px solid var(--border-soft);border-radius:18px;padding:16px}.step h3{margin:0 0 12px;font-size:19px;color:#111827}.route{padding:12px 16px;color:var(--muted);font-size:16px}.actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding:16px}.actions button{border-radius:16px}.result{padding:18px}.result h2{margin:0 0 10px;font-size:26px}.pill{display:inline-block;background:var(--primary-soft);color:#0b3b9e;border:1px solid #b7d0ff;border-radius:999px;padding:5px 10px;font-weight:900;font-size:15px;margin:0 5px 8px 0}.field{margin:9px 0}.field strong{font-weight:900}.penal{border-left:6px solid var(--warn);background:#fff1f2;padding:14px;border-radius:14px;margin-top:12px;color:#7f1d1d}.ok{border-left:6px solid #15803d;background:#f0fdf4;padding:14px;border-radius:14px;margin-top:12px;color:#14532d}.margin-warning{color:#b42318;font-style:italic;font-weight:800;margin-top:8px}.margin-card{border:1px solid #fecaca;background:#fff7f7;border-radius:16px;padding:14px}.margin-card h3{color:#991b1b}.margin-table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:14px;background:#fff}.margin-table th{background:#1e293b;color:#fff;text-align:left}.margin-table th,.margin-table td{padding:12px;border-bottom:1px solid #e2e8f0;font-size:16px}.margin-table .zone{font-weight:900}.calcBox{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:12px}.calcBox input{border:1px solid var(--border);border-radius:14px;padding:13px;font-size:18px}.vmp-screen{padding:18px;background:#f8fafc}.vmp-header{background:linear-gradient(180deg,#fff,#f1f5f9);border:1px solid var(--border);border-left:8px solid #1d4ed8;border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 8px 18px rgba(15,23,42,.05)}.vmp-header h2{font-size:28px;margin:0 0 10px;color:#0f172a}.vmp-header p{margin:8px 0;font-size:18px;color:#26364c}.vmp-header a{display:inline-block;margin-top:6px;background:#1d4ed8;color:#fff;text-decoration:none;border-radius:14px;padding:11px 14px;font-weight:900}.vmp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.vmp-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:18px;box-shadow:0 8px 18px rgba(15,23,42,.06);position:relative;overflow:hidden}.vmp-card::before{content:"";position:absolute;inset:0 0 auto 0;height:6px;background:#1d4ed8}.vmp-card:nth-child(2)::before{background:#0f766e}.vmp-card:nth-child(3)::before{background:#92400e}.vmp-card:nth-child(4)::before{background:#334155}.vmp-card h3{margin:6px 0 12px;font-size:24px;line-height:1.2;color:#0f172a}.vmp-code{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}.vmp-code span{background:#e0ecff;border:1px solid #b7d0ff;color:#0b3b9e;border-radius:999px;padding:6px 10px;font-size:16px;font-weight:900}.vmp-card p{font-size:18px;margin:10px 0}.vmp-amount{background:#eef6ff;border:1px solid #bfdbfe;color:#0f3d89;border-radius:14px;padding:10px 12px;font-weight:900}.vmp-list{margin:10px 0 12px;padding-left:22px}.vmp-list li{margin:7px 0;font-size:18px}.vmp-note{background:#f8fafc;border-left:5px solid #64748b;border-radius:12px;padding:12px;color:#334155}.vmp-card:nth-child(4) .vmp-note{border-left-color:#334155;background:#f1f5f9}@media(max-width:760px){body{font-size:17px}.app{padding:12px 10px 24px}.hero{border-radius:16px;padding:15px}.hero h1{font-size:25px}.section{padding:14px}.row{gap:8px}#materiaRow{display:grid;grid-template-columns:1fr 1fr;align-items:stretch}#materiaRow button{width:100%;padding:13px 10px;font-size:16px}#materiaRow button[data-materia="VMP"]{margin-left:0;grid-column:1 / -1}.actions{grid-template-columns:1fr;gap:9px;padding:12px}.step{padding:14px;border-radius:16px}.vmp-screen{padding:12px}.vmp-header{padding:15px;border-radius:16px}.vmp-header h2{font-size:24px}.vmp-grid{grid-template-columns:1fr;gap:12px}.vmp-card{padding:16px}.vmp-card h3{font-size:22px}.vmp-card p,.vmp-list li{font-size:17px}.calcBox{grid-template-columns:1fr}.margin-table th,.margin-table td{font-size:14px;padding:9px}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -81,12 +24,13 @@
         <button data-materia="SOA">SOA</button>
         <button data-materia="ITV">ITV</button>
         <button data-materia="PERMISOS">PERMISOS CONDUCIR</button>
+        <button data-materia="VMP">VMP</button>
       </div>
     </div>
 
     <div id="treeArea" class="stack"></div>
 
-    <div class="actions">
+    <div class="actions" id="actionBar">
       <button class="primary" id="btnResolver" type="button">Resolver</button>
       <button id="btnVolver" type="button">Volver</button>
       <button id="btnLimpiar" type="button">Limpiar</button>
@@ -97,14 +41,14 @@
 </div>
 
 <script>
-const URL = "BASE_INFRACCIONES.csv";
+const CSV_URLS = ["BASE_INFRACCIONES.csv", "base_infracciones.csv", "BASE_INFRACCIONES_DGT_actualizada_SOA_DROGAS.csv"];
 let records = [];
 
 const state = {
   materia: "",
   history: [],
   alcohol: {grupo:"", medio:"", supuesto:"", reincidente:"", vehiculo:""},
-  drogas: {supuesto:""},
+  drogas: {supuesto:"", vehiculo:""},
   soa: {vehiculo:"", circula:""},
   itv: {estado:"", detalle:""},
   permisos: {tipo:"", detalle:"", judicial:"", judicialPena:""}
@@ -128,21 +72,29 @@ function parseCSVLine(line){
 }
 
 async function loadCSV(){
-  try{
-    const res = await fetch(URL,{method:"GET"});
-    if(!res.ok) return [];
-    const text = await res.text();
-    const lines = text.split(/\r?\n/).filter(x => x.trim() !== "");
-    if(lines.length < 2) return [];
-    const headers = parseCSVLine(lines[0]).map(h=>h.trim());
-    const rows = lines.slice(1).map(line=>{
-      const vals = parseCSVLine(line);
-      const obj = {};
-      headers.forEach((h,i)=> obj[h] = (vals[i] || "").trim());
-      return obj;
-    });
-    return cleanRows(rows);
-  }catch(e){ return []; }
+  for (const csvUrl of CSV_URLS){
+    try{
+      const res = await fetch(csvUrl, {method:"GET", cache:"no-store"});
+      if(!res.ok) continue;
+      const text = await res.text();
+      const lines = text.split(/\r?\n/).filter(x => x.trim() !== "");
+      if(lines.length < 2) continue;
+      const headers = parseCSVLine(lines[0]).map(h=>h.trim());
+      const rows = lines.slice(1).map(line=>{
+        const vals = parseCSVLine(line);
+        const obj = {};
+        headers.forEach((h,i)=> obj[h] = (vals[i] || "").trim());
+        return obj;
+      });
+      const clean = cleanRows(rows);
+      console.log("CSV cargado:", csvUrl, clean.length, "filas");
+      return clean;
+    }catch(e){
+      console.warn("No se pudo cargar CSV:", csvUrl, e);
+    }
+  }
+  alert("No se ha podido cargar la base de infracciones. El CSV debe estar junto al index y llamarse BASE_INFRACCIONES.csv o base_infracciones.csv");
+  return [];
 }
 
 function resetState(){
@@ -157,6 +109,8 @@ function resetState(){
 
 function resetAll(){
   resetState();
+  const actionBar = document.getElementById("actionBar");
+  if(actionBar) actionBar.style.display = "grid";
   document.querySelectorAll("#materiaRow button").forEach(b=>b.classList.remove("active"));
   document.getElementById("treeArea").innerHTML = "";
   document.getElementById("resultado").innerHTML = "Selecciona una materia para empezar.";
@@ -189,7 +143,13 @@ function goBack(){
   state.itv = prev.itv;
   state.permisos = prev.permisos;
   activateMatterButton(state.materia);
-  renderTree();
+  const actionBar = document.getElementById("actionBar");
+  if(state.materia === "VMP"){
+    renderVmpInfo();
+  } else {
+    if(actionBar) actionBar.style.display = "grid";
+    renderTree();
+  }
 }
 
 function selectMatter(materia){
@@ -201,6 +161,12 @@ function selectMatter(materia){
   state.itv = {estado:"", detalle:""};
   state.permisos = {tipo:"", detalle:"", judicial:"", judicialPena:""};
   activateMatterButton(materia);
+  const actionBar = document.getElementById("actionBar");
+  if(materia === "VMP"){
+    renderVmpInfo();
+    return;
+  }
+  if(actionBar) actionBar.style.display = "grid";
   renderTree();
   document.getElementById("resultado").innerHTML = "Completa el árbol y pulsa Resolver.";
 }
@@ -209,22 +175,24 @@ document.querySelectorAll("#materiaRow button").forEach(btn=>{
   btn.addEventListener("click", ()=> selectMatter(btn.dataset.materia));
 });
 
-function makeStep(title, options, current, onPick){
-  const wrap = document.createElement("div");
-  wrap.className = "step";
-  wrap.innerHTML = `<div class="step-title">${title}</div>`;
-  const row = document.createElement("div");
-  row.className = "row";
-  options.forEach(opt=>{
+function makeStep(title, options, current, onClick){
+  const card = document.createElement("div");
+  card.className = "step";
+  const h = document.createElement("h2"); h.textContent = title; card.appendChild(h);
+  const opts = document.createElement("div"); opts.className = "options";
+  options.forEach(raw=>{
+    const value = typeof raw === "object" ? raw.value : raw;
+    const htmlLabel = typeof raw === "object" ? raw.html : null;
+    const label = typeof raw === "object" ? raw.label : raw;
     const b = document.createElement("button");
     b.type = "button";
-    b.textContent = opt;
-    if(opt === current) b.classList.add("active");
-    b.onclick = ()=> onPick(opt);
-    row.appendChild(b);
+    if(htmlLabel){ b.innerHTML = htmlLabel; } else { b.textContent = label; }
+    if(current === value) b.classList.add("active");
+    b.addEventListener("click", ()=> onClick(value));
+    opts.appendChild(b);
   });
-  wrap.appendChild(row);
-  return wrap;
+  card.appendChild(opts);
+  return card;
 }
 
 function renderPath(text){
@@ -348,6 +316,122 @@ function calcularMargenAlcohol(){
   out.innerHTML = `<strong>Valor tras margen de error:</strong> ${String(real.toFixed(2)).replace(".", ",")} mg/l. <br><strong>Criterio:</strong> ${tramoOrientativo(real)}`;
 }
 
+
+const VMP_INFO_CARDS = [
+  {
+    title: "Carecer de autorización administrativa / vehículo fuera de norma",
+    code: ["RGV", "Art. 1", "Ap. 1", "Op. 5B"],
+    amount: "500 / 250 €",
+    text: "Circular con un vehículo que carece de la correspondiente autorización administrativa, permiso de circulación, vehículo fuera de norma o vehículo ilegal.",
+    note: "Puede dar lugar a inmovilización. En el codificado aparece también como VEH 001 / LSV 066, opción 5B, con referencia a instrucciones DGT sobre VMP."
+  },
+  {
+    title: "Elementos técnicos obligatorios del VMP",
+    code: ["RGV", "Art. 7", "Ap. 3", "Op. 5B"],
+    amount: "200 / 100 €",
+    text: "Circular con un VMP careciendo de elementos sujetos a reglamentación técnica, incumpliendo el Anexo XXI de características y requisitos técnicos de los VMP.",
+    note: "Útil especialmente para VMP posteriores al 22/01/2024 con certificado de circulación.",
+    list: [
+      "No disponer de dos frenos independientes.",
+      "No disponer de sistema de estabilización en estacionamiento.",
+      "Uso de neumáticos lisos o tipo slick.",
+      "No llevar catadióptricos frontal, laterales y trasero.",
+      "No estar equipado con avisador acústico integrado.",
+      "No llevar visualizador de nivel de batería y velocidad instantánea.",
+      "Carecer de placa de marcaje de fábrica cuando proceda.",
+      "Carecer de portaidentificador cuando proceda."
+    ]
+  },
+  {
+    title: "Luces no reglamentarias",
+    code: ["RGV", "Art. 15", "Ap. 5", "Op. 5A"],
+    amount: "200 / 100 €",
+    text: "Circular llevando instaladas más luces de las reglamentariamente admitidas o de color diferente al establecido reglamentariamente.",
+    note: "Especificar en denuncia qué luces o color no reglamentario se observa."
+  },
+  {
+    title: "Casco en VMP - Ordenanza municipal",
+    code: ["Ordenanza Movilidad", "Art. 39 bis", "Ap. 2", "Punto 2.4"],
+    amount: "Según ordenanza",
+    text: "El uso del casco es obligatorio para todas las personas usuarias de vehículos de movilidad personal.",
+    note: "Base competencial: art. 139 LBRL en defecto de normativa sectorial específica y art. 25.2.g LBRL sobre tráfico y movilidad."
+  }
+];
+
+function renderVmpInfo(){
+  const treeEl = document.getElementById("treeArea");
+  const resultEl = document.getElementById("resultado");
+  const actionBar = document.getElementById("actionBar");
+  if(actionBar) actionBar.style.display = "none";
+
+  if(resultEl) resultEl.innerHTML = "";
+  if(!treeEl) return;
+
+  const cards = [
+    {
+      title:"CIRCULAR SIN AUTORIZACIÓN ADMINISTRATIVA",
+      code:["RGV 1.1 5B"],
+      amount:"500 € / reducido 250 €",
+      text:"Circular con un vehículo que carece de la correspondiente autorización administrativa, permiso de circulación.",
+      note:"Puede dar lugar a inmovilización.",
+      list:["Vehículo fuera de norma.", "Vehículo ilegal.", "Comprado a partir del 22/01/2024 que carece de Certificado de VMP."]
+    },
+    {
+      title:"Elementos técnicos obligatorios del VMP",
+      code:["RGV 7.3.5B", "200/100 €"],
+      amount:"200 € / reducido 100 €",
+      text:"Circular con un VMP careciendo de elementos sujetos a la reglamentación técnica, incumpliendo el Anexo XXI de características y requisitos técnicos de los VMP.",
+      note:"Obligatorio en VMP posterior a 22/01/2024 con certificado de circulación. Se debe especificar el elemento concreto detectado.",
+      list:[
+        "No disponer de dos frenos independientes.",
+        "No disponer de sistema de estabilización en aparcamiento.",
+        "Utilización de neumáticos lisos o tipo slick.",
+        "No llevar catadióptricos frontal, laterales y trasero.",
+        "No estar equipado con avisador acústico.",
+        "No llevar visualizador de batería y velocidad instantánea.",
+        "Carecer de placa de marcaje de fábrica cuando proceda.",
+        "Carecer de portaidentificador cuando proceda."
+      ]
+    },
+    {
+      title:"Luces no reglamentarias",
+      code:["RGV 15.5.5A", "200/100 €"],
+      amount:"200 € / reducido 100 €",
+      text:"Circular llevando instaladas más luces de las reglamentariamente admitidas o de color diferente al establecido reglamentariamente.",
+      note:"Especificar en denuncia el defecto observado."
+    },
+    {
+      title:"Casco obligatorio por Ordenanza municipal",
+      code:["Ordenanza Movilidad Torrent", "Art. 39 bis.2.2.4"],
+      amount:"Base legal de actuación",
+      text:"El uso del casco es obligatorio para todas las personas usuarias de vehículos de movilidad personal.",
+      note:"El art. 139 LBRL permite regular y sancionar en defecto de normativa sectorial específica. Competencia municipal en tráfico y movilidad: art. 25.g LBRL."
+    }
+  ];
+
+  treeEl.innerHTML = `
+    <div class="vmp-screen">
+      <div class="vmp-header">
+        <h2>Infracciones básicas de VMP</h2>
+        <p><strong>Comprados antes de 22 enero 2024</strong> solo podrán circular hasta <strong>22 enero 2027</strong>.</p>
+        <p><strong>Comprados desde esta fecha</strong> deben disponer de <strong>Certificado VMP</strong>. Para ello deben estar certificados.</p>
+        <p><a href="https://www.dgt.es/nuestros-servicios/tu-vehiculo/vehiculos-de-movilidad-personal-vmp/" target="_blank" rel="noopener noreferrer"><strong>Modelos certificados DGT</strong></a></p>
+      </div>
+      <div class="vmp-grid">
+        ${cards.map(card => `
+          <article class="vmp-card">
+            <h3>${card.title}</h3>
+            <div class="vmp-code">${card.code.map(c => `<span>${c}</span>`).join("")}</div>
+            <p><strong>Hecho:</strong> ${card.text}</p>
+            <p class="vmp-amount">${card.amount}</p>
+            ${card.list ? `<ul class="vmp-list">${card.list.map(x => `<li>${x}</li>`).join("")}</ul>` : ""}
+            <p class="vmp-note"><strong>Comentario operativo:</strong> ${card.note}</p>
+          </article>
+        `).join("")}
+      </div>
+    </div>`;
+}
+
 function renderTree(){
   const area = document.getElementById("treeArea");
   area.innerHTML = "";
@@ -432,13 +516,21 @@ function renderTree(){
     area.appendChild(makeStep("1. Supuesto", ["POSITIVO", "NEGATIVA A REALIZAR PRUEBA"], state.drogas.supuesto, (opt)=>{
       saveSnapshot();
       state.drogas.supuesto = opt;
+      state.drogas.vehiculo = "";
       renderTree();
     }));
-    area.appendChild(renderPath(`Ruta: DROGAS → ${state.drogas.supuesto || "—"}`));
+    if(state.drogas.supuesto === "NEGATIVA A REALIZAR PRUEBA"){
+      area.appendChild(makeStep("2. Tipo de vehículo", ["BICIS/EPAC/VMP","RESTO DE VEHÍCULOS"], state.drogas.vehiculo, (opt)=>{
+        saveSnapshot();
+        state.drogas.vehiculo = opt;
+        renderTree();
+      }));
+    }
+    area.appendChild(renderPath(`Ruta: DROGAS → ${state.drogas.supuesto || "—"}${state.drogas.vehiculo ? " → " + state.drogas.vehiculo : ""}`));
   }
 
   if(state.materia === "SOA"){
-    area.appendChild(makeStep("1. Vehículo", ["CICLOMOTOR","MOTOCICLETA","TURISMO","3ª CATEGORÍA"], state.soa.vehiculo, (opt)=>{
+    area.appendChild(makeStep("1. Vehículo", ["CICLOMOTOR","MOTOCICLETA","TURISMO","3ª CATEGORÍA","VMP",{value:"VPL", html:"VPL<br><small>(VMP&lt;25Kg)</small>"}], state.soa.vehiculo, (opt)=>{
       saveSnapshot();
       state.soa.vehiculo = opt;
       state.soa.circula = "";
@@ -531,13 +623,18 @@ function recordFromTree(){
   if(state.materia === "SOA"){
     const map = {
       "CICLOMOTOR|SÍ":"1","MOTOCICLETA|SÍ":"2","TURISMO|SÍ":"3","3ª CATEGORÍA|SÍ":"4",
-      "CICLOMOTOR|NO":"5","MOTOCICLETA|NO":"6","TURISMO|NO":"7","3ª CATEGORÍA|NO":"8"
+      "CICLOMOTOR|NO":"5","MOTOCICLETA|NO":"6","TURISMO|NO":"7","3ª CATEGORÍA|NO":"8",
+      "VMP|SÍ":"SOA_VMP_CIRCULA","VMP|NO":"SOA_VMP_CARECE",
+      "VPL|SÍ":"SOA_VPL_CIRCULA","VPL|NO":"SOA_VPL_CARECE"
     };
     return findById(map[`${state.soa.vehiculo}|${state.soa.circula}`]);
   }
 
   if(state.materia === "DROGAS"){
-    return findById(state.drogas.supuesto === "POSITIVO" ? "18" : state.drogas.supuesto === "NEGATIVA A REALIZAR PRUEBA" ? "19" : "");
+    if(state.drogas.supuesto === "POSITIVO") return findById("18");
+    if(state.drogas.supuesto === "NEGATIVA A REALIZAR PRUEBA" && state.drogas.vehiculo === "BICIS/EPAC/VMP") return findById("DROGAS_NEG_BICI_VMP_EPAC");
+    if(state.drogas.supuesto === "NEGATIVA A REALIZAR PRUEBA" && state.drogas.vehiculo === "RESTO DE VEHÍCULOS") return findById("19");
+    return null;
   }
 
   if(state.materia === "ITV"){
@@ -697,13 +794,14 @@ function renderResult(record){
 }
 
 function isTreeComplete(){
+  if(state.materia === "VMP") return true;
   if(state.materia === "ALCOHOL"){
     if(!state.alcohol.grupo || !state.alcohol.medio) return false;
     if(["NEGATIVA A REALIZAR PRUEBA","0,40 + ACCIDENTE / INFRACCIÓN"].includes(state.alcohol.medio)) return !!state.alcohol.vehiculo;
     return !!(state.alcohol.supuesto && state.alcohol.reincidente && state.alcohol.vehiculo);
   }
 
-  if(state.materia === "DROGAS") return !!state.drogas.supuesto;
+  if(state.materia === "DROGAS") return state.drogas.supuesto === "POSITIVO" || (state.drogas.supuesto === "NEGATIVA A REALIZAR PRUEBA" && !!state.drogas.vehiculo);
   if(state.materia === "SOA") return !!(state.soa.vehiculo && state.soa.circula);
   if(state.materia === "ITV"){
     if(state.itv.estado === "CADUCADA") return true;
@@ -725,6 +823,7 @@ function isTreeComplete(){
 }
 
 document.getElementById("btnResolver").addEventListener("click", ()=>{
+  if(state.materia === "VMP"){ renderVmpInfo(); return; }
   if(!state.materia || !isTreeComplete()){
     document.getElementById("resultado").innerHTML = "Completa el árbol antes de resolver.";
     return;
