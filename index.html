@@ -6,12 +6,224 @@
   <title>Consulta Infracciones DGT</title>
 <style>
 :root{--bg:#eef3f8;--surface:#fff;--text:#0f172a;--muted:#475569;--border:#cbd5e1;--border-soft:#e2e8f0;--primary:#1d4ed8;--primary-dark:#173ea8;--primary-soft:#dbeafe;--warn:#b42318;--shadow:0 10px 28px rgba(15,23,42,.08)}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#f8fafc 0%,var(--bg) 100%);color:var(--text);font-size:18px;line-height:1.45}.app{max-width:1120px;margin:0 auto;padding:18px 16px 34px}.hero{background:linear-gradient(135deg,#102a56,#1d4ed8);color:#fff;border-radius:20px;padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.16)}.hero h1{margin:0;font-size:29px}.hero p{margin:5px 0 0;color:#dbeafe;font-size:17px}.panel,.result{background:rgba(255,255,255,.96);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}.panel{margin-bottom:14px}.section{padding:16px;border-bottom:1px solid var(--border-soft)}.section h2{font-size:18px;margin:0 0 12px;color:#172033;text-transform:uppercase;letter-spacing:.04em}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}button{border:1px solid var(--border);background:#fff;border-radius:999px;padding:14px 18px;font-weight:800;font-size:17px;color:#0f172a;cursor:pointer;transition:background .15s,border-color .15s,transform .05s,box-shadow .15s;min-height:52px}button:active{transform:translateY(1px)}button:hover{border-color:#93a4bd;background:#f8fafc}.selected,.active{background:#0f766e;border-color:#0f766e;color:#fff;box-shadow:0 8px 18px rgba(15,118,110,.30)}.selected:hover,.active:hover{background:#115e59;border-color:#115e59;color:#fff}button.primary{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 6px 14px rgba(29,78,216,.24)}button.primary:hover{background:var(--primary-dark);border-color:var(--primary-dark);color:#fff}#materiaRow button[data-materia="VMP"]{margin-left:auto;background:#15803d;color:#fff;border-color:#15803d}#materiaRow button[data-materia="VMP"]:hover{background:#166534;border-color:#166534}#materiaRow button[data-materia="VMP"].active,#materiaRow button[data-materia="VMP"].selected{background:#14532d;border-color:#14532d;color:#fff;box-shadow:0 8px 18px rgba(20,83,45,.35)}.stack{display:flex;flex-direction:column;gap:12px}.step{background:#fff;border:1px solid var(--border-soft);border-radius:18px;padding:16px}.step h3{margin:0 0 12px;font-size:19px;color:#111827}.route{padding:12px 16px;color:var(--muted);font-size:16px}.actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding:16px}.actions button{border-radius:16px}.result{padding:18px}.result h2{margin:0 0 10px;font-size:26px}.pill{display:inline-block;background:var(--primary-soft);color:#0b3b9e;border:1px solid #b7d0ff;border-radius:999px;padding:5px 10px;font-weight:900;font-size:15px;margin:0 5px 8px 0}.field{margin:9px 0}.field strong{font-weight:900}.penal{border-left:6px solid var(--warn);background:#fff1f2;padding:14px;border-radius:14px;margin-top:12px;color:#7f1d1d}.ok{border-left:6px solid #15803d;background:#f0fdf4;padding:14px;border-radius:14px;margin-top:12px;color:#14532d}.margin-warning{color:#b42318;font-style:italic;font-weight:800;margin-top:8px}.margin-card{border:1px solid #fecaca;background:#fff7f7;border-radius:16px;padding:14px}.margin-card h3{color:#991b1b}.margin-table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:14px;background:#fff}.margin-table th{background:#1e293b;color:#fff;text-align:left}.margin-table th,.margin-table td{padding:12px;border-bottom:1px solid #e2e8f0;font-size:16px}.margin-table .zone{font-weight:900}.calcBox{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:12px}.calcBox input{border:1px solid var(--border);border-radius:14px;padding:13px;font-size:18px}.vmp-screen{padding:18px;background:#f8fafc}.vmp-header{background:linear-gradient(180deg,#fff,#f1f5f9);border:1px solid var(--border);border-left:8px solid #1d4ed8;border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 8px 18px rgba(15,23,42,.05)}.vmp-header h2{font-size:28px;margin:0 0 10px;color:#0f172a}.vmp-header p{margin:8px 0;font-size:18px;color:#26364c}.vmp-header a{display:inline-block;margin-top:6px;background:#1d4ed8;color:#fff;text-decoration:none;border-radius:14px;padding:11px 14px;font-weight:900}.vmp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.vmp-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:18px;box-shadow:0 8px 18px rgba(15,23,42,.06);position:relative;overflow:hidden}.vmp-card::before{content:"";position:absolute;inset:0 0 auto 0;height:6px;background:#1d4ed8}.vmp-card:nth-child(2)::before{background:#0f766e}.vmp-card:nth-child(3)::before{background:#92400e}.vmp-card:nth-child(4)::before{background:#334155}.vmp-card h3{margin:6px 0 12px;font-size:24px;line-height:1.2;color:#0f172a}.vmp-code{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}.vmp-code span{background:#e0ecff;border:1px solid #b7d0ff;color:#0b3b9e;border-radius:999px;padding:6px 10px;font-size:16px;font-weight:900}.vmp-card p{font-size:18px;margin:10px 0}.vmp-amount{background:#eef6ff;border:1px solid #bfdbfe;color:#0f3d89;border-radius:14px;padding:10px 12px;font-weight:900}.vmp-list{margin:10px 0 12px;padding-left:22px}.vmp-list li{margin:7px 0;font-size:18px}.vmp-note{background:#f8fafc;border-left:5px solid #64748b;border-radius:12px;padding:12px;color:#334155}.vmp-card:nth-child(4) .vmp-note{border-left-color:#334155;background:#f1f5f9}@media(max-width:760px){body{font-size:17px}.app{padding:12px 10px 24px}.hero{border-radius:16px;padding:15px}.hero h1{font-size:25px}.section{padding:14px}.row{gap:8px}#materiaRow{display:grid;grid-template-columns:1fr 1fr;align-items:stretch}#materiaRow button{width:100%;padding:13px 10px;font-size:16px}#materiaRow button[data-materia="VMP"]{margin-left:0;grid-column:1 / -1}.actions{grid-template-columns:1fr;gap:9px;padding:12px}.step{padding:14px;border-radius:16px}.vmp-screen{padding:12px}.vmp-header{padding:15px;border-radius:16px}.vmp-header h2{font-size:24px}.vmp-grid{grid-template-columns:1fr;gap:12px}.vmp-card{padding:16px}.vmp-card h3{font-size:22px}.vmp-card p,.vmp-list li{font-size:17px}.calcBox{grid-template-columns:1fr}.margin-table th,.margin-table td{font-size:14px;padding:9px}}
+
+/* Resultado tipo tarjeta operativa */
+.result{padding:22px;background:#ffffff;border-radius:22px}
+.result .result-chipbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.result .badge,.result .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 12px;font-size:15px;font-weight:900;letter-spacing:.02em;border:1px solid transparent}
+.result .badge.blue{background:#dbeafe;color:#1d4ed8;border-color:#bfdbfe}
+.result .badge.green{background:#dcfce7;color:#166534;border-color:#bbf7d0}
+.result .badge.gray{background:#f1f5f9;color:#334155;border-color:#cbd5e1}
+.result .title,.result .result-title{font-size:30px;line-height:1.22;font-weight:950;color:#061225;margin:8px 0 24px;letter-spacing:-.025em}
+.result .summary-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:18px 0 18px}
+.result .summary-card{border-radius:18px;padding:14px 16px;min-height:76px;display:flex;align-items:center;gap:12px;border:1px solid transparent}
+.result .summary-icon{font-size:25px;line-height:1;flex:0 0 auto}
+.result .summary-label{font-size:14px;font-weight:950;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.result .summary-value{font-size:20px;font-weight:950;color:#071225}
+.result .summary-red{background:#fee2e2;border-color:#fecaca}.result .summary-red .summary-label,.result .summary-red .summary-icon{color:#dc2626}
+.result .summary-blue{background:#eaf2ff;border-color:#bfdbfe}.result .summary-blue .summary-label,.result .summary-blue .summary-icon{color:#2563eb}
+.result .summary-green{background:#e6f8ef;border-color:#bbf7d0}.result .summary-green .summary-label,.result .summary-green .summary-icon{color:#059669}
+.result .summary-purple{background:#f3e8ff;border-color:#e9d5ff}.result .summary-purple .summary-label,.result .summary-purple .summary-icon{color:#9333ea}
+.result .summary-slate{background:#f1f5f9;border-color:#e2e8f0}.result .summary-slate .summary-label,.result .summary-slate .summary-icon{color:#334155}
+.result .result-block{border-radius:18px;padding:16px 18px;margin:14px 0;font-size:19px;line-height:1.55}
+.result .result-block strong{font-weight:950}
+.result .block-neutral{background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a}
+.result .block-blue{background:#eaf2ff;border-left:6px solid #2563eb;color:#0f172a}
+.result .block-green{background:#e7f8ef;border-left:6px solid #059669;color:#064e3b}
+.result .block-red{background:#fff1f2;border-left:6px solid #dc2626;color:#7f1d1d}
+.result .block-title{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:950;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+.result .block-blue .block-title{color:#1d4ed8}.result .block-green .block-title{color:#059669}.result .block-red .block-title{color:#dc2626}
+@media(max-width:900px){.result .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.result .summary-card:last-child{grid-column:1 / -1}}
+@media(max-width:560px){.result{padding:16px}.result .result-title,.result .title{font-size:24px}.result .summary-grid{grid-template-columns:1fr}.result .summary-card:last-child{grid-column:auto}.result .result-block{font-size:17px;padding:14px}}
+
+
+/* Pulido visual general sin tocar lógica */
+.panel{
+  background:rgba(255,255,255,.98);
+  border:1px solid #d7e0eb;
+  border-radius:24px;
+}
+.section{
+  background:linear-gradient(180deg,#ffffff,#f8fafc);
+}
+.section h2{
+  color:#1e293b;
+  font-size:17px;
+  font-weight:950;
+}
+#materiaRow{
+  gap:12px;
+}
+#materiaRow button{
+  background:#ffffff;
+  border:1px solid #cbd5e1;
+  box-shadow:0 2px 0 rgba(15,23,42,.04);
+}
+#materiaRow button.active,
+#materiaRow button.selected{
+  background:#0f766e;
+  border-color:#0f766e;
+  color:#ffffff;
+  box-shadow:0 10px 22px rgba(15,118,110,.28);
+}
+#treeArea{
+  padding:0 16px 12px;
+}
+.step{
+  background:linear-gradient(180deg,#ffffff,#f8fafc);
+  border:1px solid #dbe4ef;
+  border-radius:22px;
+  padding:18px;
+  box-shadow:0 8px 20px rgba(15,23,42,.045);
+}
+.step h2,
+.step h3,
+.step .step-title{
+  color:#0f172a;
+  font-weight:950;
+  font-size:20px;
+  margin:0 0 14px;
+  letter-spacing:-.01em;
+}
+.options,
+.step .row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.step button{
+  background:#ffffff;
+  border:1px solid #cbd5e1;
+  color:#0f172a;
+}
+.step button.active,
+.step button.selected{
+  background:#0f766e;
+  border-color:#0f766e;
+  color:#fff;
+  box-shadow:0 9px 20px rgba(15,118,110,.30);
+}
+.step button:hover{
+  border-color:#94a3b8;
+}
+.step button.active:hover,
+.step button.selected:hover{
+  background:#115e59;
+  border-color:#115e59;
+}
+.path,
+.route{
+  margin:0 0 4px;
+  background:#f1f5f9;
+  border:1px solid #e2e8f0;
+  color:#334155;
+  border-radius:16px;
+  padding:12px 14px;
+  font-size:16px;
+  font-weight:700;
+}
+.actions{
+  background:linear-gradient(180deg,#f8fafc,#eef3f8);
+  border-top:1px solid #e2e8f0;
+}
+.actions button{
+  background:#ffffff;
+  border:1px solid #cbd5e1;
+  box-shadow:0 3px 0 rgba(15,23,42,.04);
+}
+.actions button.primary{
+  background:#1d4ed8;
+  border-color:#1d4ed8;
+  color:#fff;
+}
+.actions button.primary:hover{
+  background:#173ea8;
+}
+.marginWarn,
+.margin-warning{
+  color:#b42318 !important;
+  font-style:italic;
+  font-weight:950;
+}
+.secondaryLink{
+  background:#eaf2ff !important;
+  color:#1d4ed8 !important;
+  border-color:#bfdbfe !important;
+}
+.secondaryLink:hover{
+  background:#dbeafe !important;
+}
+.marginTableWrap{
+  overflow:auto;
+  border-radius:18px;
+  border:1px solid #e2e8f0;
+  box-shadow:0 6px 14px rgba(15,23,42,.04);
+}
+.marginTable{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+}
+.marginTable th{
+  background:#1e293b;
+  color:#fff;
+  text-align:left;
+  font-size:15px;
+  padding:13px;
+}
+.marginTable td{
+  padding:13px;
+  border-bottom:1px solid #e2e8f0;
+  font-size:16px;
+}
+.marginTable tr:nth-child(even) td{
+  background:#f8fafc;
+}
+.calcBox{
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  border-radius:18px;
+  padding:14px;
+  margin-top:14px;
+}
+.tinyInput{
+  border:1px solid #cbd5e1;
+  border-radius:14px;
+  padding:13px;
+  font-size:18px;
+  width:100%;
+}
+.vmp-header{
+  border-left-color:#0f766e;
+}
+.vmp-card{
+  border-radius:22px;
+}
+.vmp-card h3{
+  font-size:25px;
+}
+.vmp-amount{
+  background:#eaf2ff;
+  border-color:#bfdbfe;
+}
+.vmp-note{
+  font-size:17px;
+}
+@media(max-width:760px){
+  #treeArea{padding:0 12px 10px}
+  .step{padding:15px;border-radius:18px}
+  .step h2,.step h3,.step .step-title{font-size:19px}
+  .step button{width:100%;justify-content:center}
+  .options,.step .row{display:grid;grid-template-columns:1fr;gap:9px}
+  .path,.route{font-size:15px}
+}
+
 </style>
 </head>
 <body>
 <div class="app">
   <div class="hero">
-    <h1>Modo Patrulla DGT</h1>
+    <h1>Consulta infracciones DGT</h1>
     <p>Consulta cerrada por árbol de decisiones.</p>
   </div>
 
@@ -764,32 +976,93 @@ function renderResult(record){
     div.innerHTML = "No hay resultado con la selección actual.";
     return;
   }
+
   const penal = (record.alerta_penal || "").toUpperCase() === "SI";
+  const inmoviliza = (record.inmovilizacion_procede || "").toUpperCase() === "SI";
+  const normaCompleta = `${record.norma || ""} ${record.articulo || ""}.${record.apartado || ""} ${record.opcion || ""}`.trim();
+
   let html = `
-    <div class="title">${record.norma} ${record.articulo}.${record.apartado} ${record.opcion}</div>
-    <span class="badge blue">ÁRBOL</span>
-    ${state.materia ? `<span class="badge green">${state.materia}</span>` : ""}
-    <div class="field"><strong>Texto:</strong> ${record.texto_literal}</div>
-    <div class="field"><strong>Calificación:</strong> ${record.calificacion}</div>
-    <div class="field"><strong>Puntos:</strong> ${record.puntos}</div>
-    <div class="field"><strong>Importe:</strong> ${record.importe} €</div>
-    <div class="field"><strong>Importe reducido:</strong> ${record.importe_reducido} €</div>
-    <div class="field"><strong>Responsable:</strong> ${record.responsable}</div>
+    <div class="result-chipbar">
+      <span class="badge blue">${state.materia || "ÁRBOL"}</span>
+      <span class="badge gray">${normaCompleta}</span>
+    </div>
+
+    <div class="result-title">${record.texto_literal || "Sin texto literal disponible"}</div>
+
+    <div class="summary-grid">
+      <div class="summary-card summary-red">
+        <div class="summary-icon">⚖️</div>
+        <div>
+          <div class="summary-label">Calificación</div>
+          <div class="summary-value">${record.calificacion || "—"}</div>
+        </div>
+      </div>
+
+      <div class="summary-card summary-blue">
+        <div class="summary-icon">💶</div>
+        <div>
+          <div class="summary-label">Importe</div>
+          <div class="summary-value">${record.importe || "—"} €</div>
+        </div>
+      </div>
+
+      <div class="summary-card summary-green">
+        <div class="summary-icon">◎</div>
+        <div>
+          <div class="summary-label">Reducido</div>
+          <div class="summary-value">${record.importe_reducido || "—"} €</div>
+        </div>
+      </div>
+
+      <div class="summary-card summary-purple">
+        <div class="summary-icon">◔</div>
+        <div>
+          <div class="summary-label">Puntos</div>
+          <div class="summary-value">${record.puntos || "0"}</div>
+        </div>
+      </div>
+
+      <div class="summary-card summary-slate">
+        <div class="summary-icon">👤</div>
+        <div>
+          <div class="summary-label">Responsable</div>
+          <div class="summary-value">${record.responsable || "—"}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-block block-neutral">
+      <strong>Inmovilización:</strong> ${inmoviliza ? "Sí" : "No procede"}${inmoviliza && record.inmovilizacion_base && record.inmovilizacion_base !== "—" ? " (" + record.inmovilizacion_base + ")" : ""}
+    </div>
   `;
-  if((record.inmovilizacion_procede || "").toUpperCase() === "SI"){
-    html += `<div class="alert inmo">Inmovilización: SÍ${record.inmovilizacion_base && record.inmovilizacion_base !== "—" ? " (" + record.inmovilizacion_base + ")" : ""}</div>`;
-  } else {
-    html += `<div class="field muted"><strong>Inmovilización:</strong> NO</div>`;
-  }
+
   if(record.comentario_operativo && record.comentario_operativo !== "—"){
-    html += `<div class="field muted"><strong>Comentario operativo:</strong> ${record.comentario_operativo}</div>`;
+    html += `
+      <div class="result-block block-blue">
+        <div class="block-title">📋 Comentario operativo</div>
+        <div>${record.comentario_operativo}</div>
+      </div>
+    `;
   }
+
   if(penal){
-    html += `<div class="alert penal">Relevancia penal: ${record.referencia_penal || "Sí"}</div>`;
+    html += `
+      <div class="result-block block-red">
+        <div class="block-title">⚠️ Relevancia penal</div>
+        <div>${record.referencia_penal || "Sí"}</div>
+      </div>
+    `;
   }
+
   if(record.accion_prioritaria && record.accion_prioritaria !== "—"){
-    html += `<div class="field muted"><strong>Acción prioritaria:</strong> ${record.accion_prioritaria}</div>`;
+    html += `
+      <div class="result-block block-green">
+        <div class="block-title">◎ Acción prioritaria</div>
+        <div>${record.accion_prioritaria}</div>
+      </div>
+    `;
   }
+
   div.innerHTML = html;
 }
 
