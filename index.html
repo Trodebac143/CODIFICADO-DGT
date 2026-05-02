@@ -218,6 +218,26 @@
   .path,.route{font-size:15px}
 }
 
+.actaLink{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-left:8px;
+  padding:5px 10px;
+  border-radius:999px;
+  background:#1d4ed8;
+  color:#ffffff !important;
+  text-decoration:none;
+  font-size:14px;
+  font-weight:950;
+  white-space:nowrap;
+  border:1px solid #1d4ed8;
+}
+.actaLink:hover{
+  background:#173ea8;
+  border-color:#173ea8;
+}
+
 </style>
 </head>
 <body>
@@ -798,7 +818,28 @@ function renderTree(){
         renderTree();
       }));
 
-      if(state.permisos.detalle === "PRIVACIÓN JUDICIAL"){
+      
+    // 🔹 BOTÓN APUNTES
+    const apuntesWrap = document.createElement("div");
+    apuntesWrap.className = "step";
+
+    const apuntesRow = document.createElement("div");
+    apuntesRow.className = "row";
+
+    const apuntesBtn = document.createElement("button");
+    apuntesBtn.type = "button";
+    apuntesBtn.className = "secondaryLink";
+    apuntesBtn.textContent = "📄 Apuntes Pérdidas de vigencia y suspensión judicial";
+
+    apuntesBtn.onclick = () => {
+      window.open("documentos/perdidas_vigencia_suspension.pdf", "_blank");
+    };
+
+    apuntesRow.appendChild(apuntesBtn);
+    apuntesWrap.appendChild(apuntesRow);
+
+    area.appendChild(apuntesWrap);
+if(state.permisos.detalle === "PRIVACIÓN JUDICIAL"){
         area.appendChild(makeStep("3. Situación", ["DENTRO DEL PLAZO DE PENA","FUERA DEL PLAZO DE PENA"], state.permisos.judicial, (opt)=>{
           saveSnapshot();
           state.permisos.judicial = opt;
@@ -970,6 +1011,14 @@ function applyOperationalOverlays(record){
   return out;
 }
 
+
+function formatComentarioOperativo(text){
+  const value = text || "";
+  const label = "ACTA DE NOTIFICACIÓN DE PÉRDIDA DE VIGENCIA";
+  const link = `${label} <a class="actaLink" href="documentos/acta_notificacion_perdida_vigencia.pdf" target="_blank" rel="noopener noreferrer">Abrir acta</a>`;
+  return value.replace(label, link);
+}
+
 function renderResult(record){
   const div = document.getElementById("resultado");
   if(!record){
@@ -1040,7 +1089,7 @@ function renderResult(record){
     html += `
       <div class="result-block block-blue">
         <div class="block-title">📋 Comentario operativo</div>
-        <div>${record.comentario_operativo}</div>
+        <div>${formatComentarioOperativo(record.comentario_operativo)}</div>
       </div>
     `;
   }
