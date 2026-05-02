@@ -238,6 +238,36 @@
   border-color:#173ea8;
 }
 
+
+
+
+.refButton{
+  margin-left:auto !important;
+  border-radius:8px !important;
+  background:#0f172a !important;
+  color:#ffffff !important;
+  border:1px solid #0f172a !important;
+  box-shadow:0 4px 12px rgba(15,23,42,.14) !important;
+  padding:14px 16px !important;
+}
+.refButton:hover{
+  background:#1e293b !important;
+  border-color:#1e293b !important;
+}
+.refButton + button[data-materia="VMP"]{
+  margin-left:12px !important;
+}
+@media(max-width:760px){
+  .refButton{
+    margin-left:0 !important;
+    grid-column:1 / -1;
+    width:100%;
+  }
+  .refButton + button[data-materia="VMP"]{
+    margin-left:0 !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -256,6 +286,7 @@
         <button data-materia="SOA">SOA</button>
         <button data-materia="ITV">ITV</button>
         <button data-materia="PERMISOS">PERMISOS CONDUCIR</button>
+        <button id="btnApuntesRef" class="refButton" type="button">📄 APUNTES DE REFERENCIA</button>
         <button data-materia="VMP">VMP</button>
       </div>
     </div>
@@ -403,8 +434,12 @@ function selectMatter(materia){
   document.getElementById("resultado").innerHTML = "Completa el árbol y pulsa Resolver.";
 }
 
-document.querySelectorAll("#materiaRow button").forEach(btn=>{
+document.querySelectorAll("#materiaRow button[data-materia]").forEach(btn=>{
   btn.addEventListener("click", ()=> selectMatter(btn.dataset.materia));
+});
+
+document.getElementById("btnApuntesRef").addEventListener("click", ()=>{
+  window.location.href = "apuntes.html";
 });
 
 function makeStep(title, options, current, onClick){
@@ -817,29 +852,7 @@ function renderTree(){
         state.permisos.judicialPena = "";
         renderTree();
       }));
-
-      
-    // 🔹 BOTÓN APUNTES
-    const apuntesWrap = document.createElement("div");
-    apuntesWrap.className = "step";
-
-    const apuntesRow = document.createElement("div");
-    apuntesRow.className = "row";
-
-    const apuntesBtn = document.createElement("button");
-    apuntesBtn.type = "button";
-    apuntesBtn.className = "secondaryLink";
-    apuntesBtn.textContent = "📄 Apuntes Pérdidas de vigencia y suspensión judicial";
-
-    apuntesBtn.onclick = () => {
-      window.open("documentos/perdidas_vigencia_suspension.pdf", "_blank");
-    };
-
-    apuntesRow.appendChild(apuntesBtn);
-    apuntesWrap.appendChild(apuntesRow);
-
-    area.appendChild(apuntesWrap);
-if(state.permisos.detalle === "PRIVACIÓN JUDICIAL"){
+      if(state.permisos.detalle === "PRIVACIÓN JUDICIAL"){
         area.appendChild(makeStep("3. Situación", ["DENTRO DEL PLAZO DE PENA","FUERA DEL PLAZO DE PENA"], state.permisos.judicial, (opt)=>{
           saveSnapshot();
           state.permisos.judicial = opt;
@@ -1013,10 +1026,7 @@ function applyOperationalOverlays(record){
 
 
 function formatComentarioOperativo(text){
-  const value = text || "";
-  const label = "ACTA DE NOTIFICACIÓN DE PÉRDIDA DE VIGENCIA";
-  const link = `${label} <a class="actaLink" href="documentos/acta_notificacion_perdida_vigencia.pdf" target="_blank" rel="noopener noreferrer">Abrir acta</a>`;
-  return value.replace(label, link);
+  return text || "";
 }
 
 function renderResult(record){

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Visor de documento</title>
+  <style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:#eef3f8;
+      color:#0f172a;
+    }
+    .toolbar{
+      position:sticky;
+      top:0;
+      z-index:10;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      padding:10px;
+      background:#ffffff;
+      border-bottom:1px solid #cbd5e1;
+      box-shadow:0 4px 14px rgba(15,23,42,.08);
+    }
+    button,a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid #cbd5e1;
+      border-radius:999px;
+      padding:10px 14px;
+      font-size:15px;
+      font-weight:900;
+      text-decoration:none;
+      background:#fff;
+      color:#0f172a;
+      cursor:pointer;
+    }
+    .primary{
+      background:#1d4ed8;
+      border-color:#1d4ed8;
+      color:#fff;
+    }
+    .secondary{
+      background:#eaf2ff;
+      color:#1d4ed8;
+      border-color:#bfdbfe;
+    }
+    .title{
+      margin-left:auto;
+      color:#475569;
+      font-weight:800;
+      font-size:14px;
+    }
+    iframe{
+      display:block;
+      width:100%;
+      height:calc(100vh - 62px);
+      border:0;
+      background:#fff;
+    }
+    .fallback{
+      padding:16px;
+      display:none;
+    }
+    @media(max-width:760px){
+      .toolbar{
+        display:grid;
+        grid-template-columns:1fr;
+      }
+      .title{
+        margin-left:0;
+        text-align:center;
+      }
+      iframe{
+        height:calc(100vh - 180px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button class="primary" onclick="window.location.href='index.html'">⬅ Pantalla principal</button>
+    <button class="secondary" onclick="window.location.href='apuntes.html'">📄 Apuntes de referencia</button>
+    <a id="openExternal" class="secondary" target="_blank" rel="noopener noreferrer">Abrir PDF en pestaña</a>
+    <span class="title" id="docTitle">Documento</span>
+  </div>
+
+  <iframe id="pdfFrame" title="Documento PDF"></iframe>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const allowedDocs = {
+      "acta_notificacion_perdida_vigencia.pdf": "Acta notificación pérdida de vigencia",
+      "perdidas_vigencia_suspension.pdf": "Pérdida de vigencia / suspensión judicial"
+    };
+
+    const requested = params.get("doc") || "";
+    const doc = allowedDocs[requested] ? requested : "perdidas_vigencia_suspension.pdf";
+    const src = "documentos/" + doc;
+
+    document.getElementById("docTitle").textContent = allowedDocs[doc];
+    document.getElementById("pdfFrame").src = src;
+    document.getElementById("openExternal").href = src;
+  </script>
+</body>
+</html>
