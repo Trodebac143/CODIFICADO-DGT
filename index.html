@@ -268,9 +268,93 @@
   }
 }
 
+
+/* ===== MODO DÍA / NOCHE ===== */
+.themeToggle{
+  position:fixed; right:14px; bottom:14px; z-index:999;
+  border-radius:10px !important; background:#0f172a !important; color:#fff !important;
+  border:1px solid #334155 !important; box-shadow:0 8px 22px rgba(15,23,42,.22) !important;
+  min-height:46px !important; padding:10px 14px !important; font-size:15px !important;
+}
+.themeToggle:hover{background:#1e293b !important}
+body.dark-mode{
+  --bg:#0f172a; --surface:#111827; --text:#e5e7eb; --muted:#cbd5e1;
+  --border:#334155; --border-soft:#1f2937; --primary-soft:#172554;
+  background:linear-gradient(180deg,#020617 0%,#0f172a 100%) !important;
+  color:#e5e7eb !important;
+}
+body.dark-mode .panel,body.dark-mode .result,body.dark-mode .step,body.dark-mode .vmp-card{
+  background:#111827 !important; border-color:#334155 !important; color:#e5e7eb !important;
+}
+body.dark-mode .section,body.dark-mode .actions,body.dark-mode .vmp-screen{
+  background:#0f172a !important; border-color:#334155 !important;
+}
+body.dark-mode .section h2,body.dark-mode .step h2,body.dark-mode .step h3,body.dark-mode .step .step-title,
+body.dark-mode .result .result-title,body.dark-mode .vmp-card h3,body.dark-mode .vmp-header h2{
+  color:#f8fafc !important;
+}
+body.dark-mode .hero{background:linear-gradient(135deg,#020617,#1e3a8a);border-color:#334155}
+body.dark-mode button:not(.primary):not(.active):not(.selected):not(.refButton):not(.themeToggle),
+body.dark-mode .secondaryLink{
+  background:#1e293b !important; color:#e5e7eb !important; border-color:#475569 !important;
+}
+body.dark-mode button:not(.primary):not(.active):not(.selected):not(.refButton):not(.themeToggle):hover,
+body.dark-mode .secondaryLink:hover{
+  background:#334155 !important; border-color:#64748b !important;
+}
+body.dark-mode .path,body.dark-mode .route,body.dark-mode .vmp-note,body.dark-mode .calcBox,body.dark-mode .block-neutral{
+  background:#1e293b !important; border-color:#334155 !important; color:#e5e7eb !important;
+}
+body.dark-mode .summary-card{background:#1e293b !important;border-color:#334155 !important}
+body.dark-mode .summary-value,body.dark-mode .summary-label{color:#f8fafc !important}
+body.dark-mode .block-blue{background:#172554 !important;color:#e5e7eb !important}
+body.dark-mode .block-green{background:#052e2b !important;color:#d1fae5 !important}
+body.dark-mode .block-red,body.dark-mode .penal{background:#450a0a !important;color:#fee2e2 !important}
+body.dark-mode .vmp-header{background:#111827 !important;border-color:#334155 !important}
+body.dark-mode .vmp-header p,body.dark-mode .vmp-card p,body.dark-mode .field,body.dark-mode .note{color:#e5e7eb !important}
+body.dark-mode .marginTable,body.dark-mode .marginTable td{
+  background:#111827 !important;color:#e5e7eb !important;border-color:#334155 !important;
+}
+body.dark-mode .marginTable tr:nth-child(even) td{background:#1e293b !important}
+body.dark-mode .tinyInput,body.dark-mode .calcBox input{
+  background:#020617 !important;color:#f8fafc !important;border-color:#475569 !important;
+}
+@media(max-width:760px){
+  .themeToggle{right:10px;bottom:10px;font-size:14px !important}
+}
+
+
+
+/* ===== AJUSTES SOLICITADOS - MOBILE FIRST ===== */
+.hero{text-align:center;}
+.hero h1{text-transform:uppercase;}
+.hero p{text-align:center;}
+#materiaRow{display:flex;align-items:stretch;}
+#materiaRow button[data-materia="VMP"]{margin-left:0 !important;background:#ffffff !important;color:#0f172a !important;border-color:#cbd5e1 !important;}
+#materiaRow button[data-materia="VMP"]:hover{background:#f8fafc !important;border-color:#94a3b8 !important;}
+#materiaRow button[data-materia="VMP"].active,#materiaRow button[data-materia="VMP"].selected{background:#0f766e !important;border-color:#0f766e !important;color:#fff !important;box-shadow:0 10px 22px rgba(15,118,110,.28) !important;}
+.refButton{margin-left:auto !important;border-radius:8px !important;background:#12356f !important;color:#ffffff !important;border-color:#12356f !important;}
+.refButton:hover{background:#0b2857 !important;border-color:#0b2857 !important;}
+.tramoHeader{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px;}
+.tramoHeader .step-title{margin:0 !important;}
+.marginCalcBtn{margin-left:auto;background:#eaf2ff !important;color:#1d4ed8 !important;border-color:#bfdbfe !important;}
+.marginCalcBtn:hover{background:#dbeafe !important;}
+@media(max-width:760px){
+  .hero h1{font-size:22px;line-height:1.15;}
+  .hero p{font-size:15px;}
+  #materiaRow{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+  #materiaRow button{font-size:15px;line-height:1.15;min-height:50px;padding:12px 8px;}
+  #materiaRow button[data-materia="PERMISOS"]{grid-column:auto;}
+  #materiaRow button[data-materia="VMP"]{grid-column:auto !important;}
+  .refButton{grid-column:1 / -1 !important;margin-left:0 !important;width:100%;}
+  .tramoHeader{display:grid;grid-template-columns:1fr;gap:10px;}
+  .marginCalcBtn{width:100%;margin-left:0;}
+}
+
 </style>
 </head>
 <body>
+<button id="themeToggle" class="themeToggle" type="button">🌙 Noche</button>
 <div class="app">
   <div class="hero">
     <h1>Consulta infracciones DGT</h1>
@@ -286,8 +370,8 @@
         <button data-materia="SOA">SOA</button>
         <button data-materia="ITV">ITV</button>
         <button data-materia="PERMISOS">PERMISOS CONDUCIR</button>
-        <button id="btnApuntesRef" class="refButton" type="button">📄 APUNTES DE REFERENCIA</button>
-        <button data-materia="VMP">VMP</button>
+        <button data-materia="VMP">NOTAS VMPs</button>
+        <button id="btnApuntesRef" class="refButton" type="button">📄 Documentos</button>
       </div>
     </div>
 
@@ -512,7 +596,19 @@ function makeMarginAccessStep(){
 function makeTramoStep(options, current, onPick){
   const wrap = document.createElement("div");
   wrap.className = "step";
-  wrap.innerHTML = `<div class="step-title">3. Tramo — <span class="marginWarn">Márgenes de error en aplicación de la Orden ICT/155/2020</span></div>`;
+
+  const header = document.createElement("div");
+  header.className = "tramoHeader";
+  header.innerHTML = `<div class="step-title">3. Tramo — <span class="marginWarn">Márgenes de error en aplicación de la Orden ICT/155/2020</span></div>`;
+
+  const marginBtn = document.createElement("button");
+  marginBtn.type = "button";
+  marginBtn.className = "marginCalcBtn";
+  marginBtn.textContent = "Cálculo tasa real tras margen";
+  marginBtn.onclick = showMarginTable;
+  header.appendChild(marginBtn);
+  wrap.appendChild(header);
+
   const row = document.createElement("div");
   row.className = "row";
   options.forEach(opt=>{
@@ -679,7 +775,7 @@ function renderVmpInfo(){
   treeEl.innerHTML = `
     <div class="vmp-screen">
       <div class="vmp-header">
-        <h2>Infracciones básicas de VMP</h2>
+        <h2>Notas VMPs</h2>
         <p><strong>Comprados antes de 22 enero 2024</strong> solo podrán circular hasta <strong>22 enero 2027</strong>.</p>
         <p><strong>Comprados desde esta fecha</strong> deben disponer de <strong>Certificado VMP</strong>. Para ello deben estar certificados.</p>
         <p><a href="https://www.dgt.es/nuestros-servicios/tu-vehiculo/vehiculos-de-movilidad-personal-vmp/" target="_blank" rel="noopener noreferrer"><strong>Modelos certificados DGT</strong></a></p>
@@ -710,8 +806,6 @@ function renderTree(){
       state.alcohol = {grupo:opt, medio:"", supuesto:"", reincidente:"", vehiculo:""};
       renderTree();
     }));
-
-    area.appendChild(makeMarginAccessStep());
 
     if(state.alcohol.grupo){
       area.appendChild(makeStep("2. Tipo", ["REALIZA PRUEBA", "0,40 + ACCIDENTE / INFRACCIÓN", "NEGATIVA A REALIZAR PRUEBA"], state.alcohol.medio, (opt)=>{
@@ -1165,6 +1259,25 @@ document.getElementById("btnResolver").addEventListener("click", ()=>{
 });
 document.getElementById("btnLimpiar").addEventListener("click", resetAll);
 document.getElementById("btnVolver").addEventListener("click", goBack);
+
+
+function initThemeToggle(){
+  const btn = document.getElementById("themeToggle");
+  if(!btn) return;
+  const savedTheme = localStorage.getItem("temaAppDGT") || "dia";
+  function applyTheme(theme){
+    const dark = theme === "noche";
+    document.body.classList.toggle("dark-mode", dark);
+    btn.textContent = dark ? "☀️ Día" : "🌙 Noche";
+    localStorage.setItem("temaAppDGT", theme);
+  }
+  applyTheme(savedTheme);
+  btn.addEventListener("click", ()=>{
+    const next = document.body.classList.contains("dark-mode") ? "dia" : "noche";
+    applyTheme(next);
+  });
+}
+initThemeToggle();
 
 loadCSV().then(rows => { records = rows; });
 </script>
