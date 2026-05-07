@@ -386,6 +386,10 @@ body.dark-mode .tinyInput,body.dark-mode .calcBox input{
 .vmp-tech-table td{border-bottom:1px solid #e5e7eb;padding:11px;vertical-align:top;font-size:16px}
 .vmp-tech-table tr:nth-child(even) td{background:#f8fafc}
 .vmp-code-pill{display:inline-block;background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:999px;padding:5px 10px;font-weight:950;white-space:nowrap}
+.vmp-dgt-link-box{display:flex;align-items:center;justify-content:center;margin:4px 0 18px}
+.vmp-dgt-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;background:#0f172a;color:#fff;border-radius:999px;padding:10px 16px;font-size:15px;font-weight:850;box-shadow:0 8px 18px rgba(15,23,42,.12)}
+.vmp-dgt-link:hover{filter:brightness(1.08)}
+body.dark-mode .vmp-dgt-link{background:#e5e7eb;color:#0f172a}
 body.dark-mode .vmp-notas-screen{background:#0f172a}
 body.dark-mode .vmp-notas-title{color:#f8fafc}
 body.dark-mode .vmp-notas-subtitle{color:#cbd5e1}
@@ -584,7 +588,7 @@ function selectMatter(materia){
   activateMatterButton(materia);
   const actionBar = document.getElementById("actionBar");
   if(materia === "VMP"){
-    renderVmpInfo();
+    window.location.href = "notas_vmp.html?v=3";
     return;
   }
   if(actionBar) actionBar.style.display = "grid";
@@ -830,6 +834,10 @@ function renderVmpInfo(){
               <div class="vmp-type-text">Velocidad máxima de fabricación: superior a 6 km/h y hasta 14 km/h. NO tienen consideración de vehículos a motor.</div>
             </div>
           </div>
+        </div>
+
+        <div class="vmp-dgt-link-box">
+          <a class="vmp-dgt-link" href="https://www.dgt.es/nuestros-servicios/tu-vehiculo/vehiculos-de-movilidad-personal-vmp/" target="_blank" rel="noopener noreferrer">Listado modelos certificados por DGT</a>
         </div>
 
         <div class="vmp-note-box vmp-important">

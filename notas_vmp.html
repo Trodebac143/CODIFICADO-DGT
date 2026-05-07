@@ -51,7 +51,48 @@ body.dark-mode .vmp-danger{background:#450a0a}
 body.dark-mode .vmp-tech-table{background:#111827;color:#e5e7eb}
 body.dark-mode .vmp-tech-table td{border-color:#334155}
 body.dark-mode .vmp-tech-table tr:nth-child(even) td{background:#1e293b}
+
+.vmp-dgt-link-box{display:flex;align-items:center;justify-content:center;margin:4px 0 18px}
+.vmp-dgt-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;background:#0f172a;color:#fff;border-radius:999px;padding:10px 16px;font-size:15px;font-weight:850;box-shadow:0 8px 18px rgba(15,23,42,.12)}
+.vmp-dgt-link:hover{filter:brightness(1.08)}
+body.dark-mode .vmp-dgt-link{background:#e5e7eb;color:#0f172a}
 @media(max-width:760px){.vmp-notas-screen{padding:12px}.vmp-notas-title{font-size:25px}.vmp-notas-subtitle{font-size:16px}.vmp-type-card{grid-template-columns:66px 1fr;gap:12px;padding:11px 14px;min-height:86px}.vmp-type-icon{width:50px;height:50px;font-size:28px}.vmp-type-icon.heavy{width:60px;height:60px;font-size:34px}.vmp-type-icon .vmp-type-badge{font-size:9px;padding:2px 6px;right:-5px;bottom:-4px}.vmp-type-title{font-size:19px}.vmp-type-text{font-size:15px}.vmp-note-box{padding:14px;border-radius:16px}.vmp-note-box h3{font-size:21px}.vmp-note-list li{font-size:16px}.vmp-tech-table th,.vmp-tech-table td{font-size:14px;padding:9px}}
+
+/* ===== BOTÓN VOLVER AL INDEX ===== */
+.vmp-back-bar{
+  max-width:1100px;
+  margin:0 auto 12px;
+  padding:0 2px;
+}
+.vmp-back-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  text-decoration:none;
+  background:#12356f;
+  color:#ffffff;
+  border:1px solid #12356f;
+  border-radius:999px;
+  padding:10px 15px;
+  font-size:15px;
+  font-weight:900;
+  box-shadow:0 6px 16px rgba(15,23,42,.14);
+}
+.vmp-back-btn:hover{
+  background:#0b2857;
+  border-color:#0b2857;
+}
+body.dark-mode .vmp-back-btn{
+  background:#e5e7eb;
+  color:#0f172a;
+  border-color:#e5e7eb;
+}
+@media(max-width:760px){
+  .vmp-back-bar{margin-bottom:10px}
+  .vmp-back-btn{width:100%;font-size:15px;padding:11px 14px}
+}
+
 
 
 
@@ -85,6 +126,10 @@ body:has(.themeToggle) .oficial-firma{bottom:66px}
 <body>
 
     <div class="vmp-notas-screen">
+    <div class="vmp-back-bar">
+      <a class="vmp-back-btn" href="index.html">← Volver al inicio</a>
+    </div>
+
       <div class="vmp-notas-wrap">
         <h2 class="vmp-notas-title">Vehículos de Movilidad Personal</h2>
         <p class="vmp-notas-subtitle">Vehículos eléctricos de una sola plaza, sin sillín o con sillín y sistema de autoequilibrado.</p>
@@ -111,6 +156,10 @@ body:has(.themeToggle) .oficial-firma{bottom:66px}
               <div class="vmp-type-text">Velocidad máxima de fabricación: superior a 6 km/h y hasta 14 km/h. NO tienen consideración de vehículos a motor.</div>
             </div>
           </div>
+        </div>
+
+        <div class="vmp-dgt-link-box">
+          <a class="vmp-dgt-link" href="https://www.dgt.es/nuestros-servicios/tu-vehiculo/vehiculos-de-movilidad-personal-vmp/" target="_blank" rel="noopener noreferrer">Listado modelos certificados por DGT</a>
         </div>
 
         <div class="vmp-note-box vmp-important">
