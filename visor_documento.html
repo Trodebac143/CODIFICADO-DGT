@@ -79,7 +79,34 @@
         height:calc(100vh - 180px);
       }
     }
-  </style>
+  
+
+/* ===== FIRMA PROPIEDAD INTELECTUAL ===== */
+.oficial-firma{
+  position:fixed;
+  right:8px;
+  bottom:5px;
+  z-index:10000;
+  padding:0;
+  background:transparent;
+  color:rgba(15,23,42,.38);
+  font-size:9px;
+  font-weight:600;
+  letter-spacing:.03em;
+  line-height:1;
+  pointer-events:none;
+  user-select:none;
+}
+body.dark-mode .oficial-firma{
+  color:rgba(248,250,252,.34);
+}
+@media(max-width:760px){
+  .oficial-firma{right:7px;bottom:5px;font-size:8px}
+}
+body:has(.themeToggle) .oficial-firma{bottom:66px}
+}
+
+</style>
 </head>
 <body>
   <div class="toolbar">
@@ -106,5 +133,6 @@
     document.getElementById("pdfFrame").src = src;
     document.getElementById("openExternal").href = src;
   </script>
+  <div class="oficial-firma">OFICIAL 46244143</div>
 </body>
 </html>

@@ -133,9 +133,43 @@
       .top-actions{display:grid;grid-template-columns:1fr}
       button,a.button{width:100%}
     }
-  </style>
+  
+.themeToggle{position:fixed;right:14px;bottom:14px;z-index:999;border-radius:10px;background:#0f172a;color:#fff;border:1px solid #334155;padding:10px 14px;font-weight:900}
+body.dark-mode{background:linear-gradient(180deg,#020617 0%,#0f172a 100%);color:#e5e7eb}
+body.dark-mode .panel,body.dark-mode .doc-card{background:#111827!important;border-color:#334155!important;color:#e5e7eb!important}
+body.dark-mode .section{background:#0f172a!important;border-color:#334155!important}
+body.dark-mode .doc-card p{color:#cbd5e1!important}
+
+
+/* ===== FIRMA PROPIEDAD INTELECTUAL ===== */
+.oficial-firma{
+  position:fixed;
+  right:8px;
+  bottom:5px;
+  z-index:10000;
+  padding:0;
+  background:transparent;
+  color:rgba(15,23,42,.38);
+  font-size:9px;
+  font-weight:600;
+  letter-spacing:.03em;
+  line-height:1;
+  pointer-events:none;
+  user-select:none;
+}
+body.dark-mode .oficial-firma{
+  color:rgba(248,250,252,.34);
+}
+@media(max-width:760px){
+  .oficial-firma{right:7px;bottom:5px;font-size:8px}
+}
+body.con-theme-toggle .oficial-firma{bottom:66px}
+}
+
+</style>
 </head>
-<body>
+<body class="con-theme-toggle">
+<button id="themeToggle" class="themeToggle" type="button">🌙 Noche</button>
   <div class="app">
     <div class="hero">
       <h1>Apuntes de referencia</h1>
@@ -170,5 +204,16 @@
       </div>
     </div>
   </div>
+
+<script>
+(function(){
+ const btn=document.getElementById("themeToggle");
+ const saved=localStorage.getItem("temaAppDGT")||"dia";
+ function apply(t){const dark=t==="noche";document.body.classList.toggle("dark-mode",dark);btn.textContent=dark?"☀️ Día":"🌙 Noche";localStorage.setItem("temaAppDGT",t);}
+ apply(saved);
+ btn.addEventListener("click",()=>apply(document.body.classList.contains("dark-mode")?"dia":"noche"));
+})();
+</script>
+  <div class="oficial-firma">OFICIAL 46244143</div>
 </body>
 </html>
