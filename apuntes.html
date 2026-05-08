@@ -209,7 +209,7 @@ body.con-theme-toggle .oficial-firma{bottom:66px}
 (function(){
  const btn=document.getElementById("themeToggle");
  const saved=localStorage.getItem("temaAppDGT")||"dia";
- function apply(t){const dark=t==="noche";document.body.classList.toggle("dark-mode",dark);btn.textContent=dark?"☀️ Día":"🌙 Noche";localStorage.setItem("temaAppDGT",t);}
+ function apply(t){const dark=t==="noche";document.body.classList.toggle("dark-mode",dark);btn.textContent=dark?"🌙 Noche":"☀️ Día";localStorage.setItem("temaAppDGT",t);}
  apply(saved);
  btn.addEventListener("click",()=>apply(document.body.classList.contains("dark-mode")?"dia":"noche"));
 })();

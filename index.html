@@ -1362,7 +1362,7 @@ function initThemeToggle(){
   function applyTheme(theme){
     const dark = theme === "noche";
     document.body.classList.toggle("dark-mode", dark);
-    btn.textContent = dark ? "☀️ Día" : "🌙 Noche";
+    btn.textContent = dark ? "🌙 Noche" : "☀️ Día";
     localStorage.setItem("temaAppDGT", theme);
   }
   applyTheme(savedTheme);

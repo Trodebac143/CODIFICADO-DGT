@@ -103,12 +103,11 @@ body.dark-mode .oficial-firma{
 @media(max-width:760px){
   .oficial-firma{right:7px;bottom:5px;font-size:8px}
 }
-body:has(.themeToggle) .oficial-firma{bottom:66px}
-}
+body.con-theme-toggle .oficial-firma{bottom:66px}
 
 </style>
 </head>
-<body>
+<body class="con-theme-toggle">
   <div class="toolbar">
     <button class="primary" onclick="window.location.href='index.html'">⬅ Pantalla principal</button>
     <button class="secondary" onclick="window.location.href='apuntes.html'">📄 Apuntes de referencia</button>
@@ -134,5 +133,14 @@ body:has(.themeToggle) .oficial-firma{bottom:66px}
     document.getElementById("openExternal").href = src;
   </script>
   <div class="oficial-firma">OFICIAL 46244143</div>
+
+<script>
+(function(){
+  const saved = localStorage.getItem("temaAppDGT") || "dia";
+  if(saved === "noche"){
+    document.body.classList.add("dark-mode");
+  }
+})();
+</script>
 </body>
 </html>

@@ -52,6 +52,22 @@ body.dark-mode .vmp-tech-table{background:#111827;color:#e5e7eb}
 body.dark-mode .vmp-tech-table td{border-color:#334155}
 body.dark-mode .vmp-tech-table tr:nth-child(even) td{background:#1e293b}
 
+
+/* ===== MODO DÍA / NOCHE ===== */
+.themeToggle{
+  position:fixed; right:14px; bottom:14px; z-index:999;
+  border-radius:10px !important; background:#0f172a !important; color:#fff !important;
+  border:1px solid #334155 !important; box-shadow:0 8px 22px rgba(15,23,42,.22) !important;
+  min-height:46px !important; padding:10px 14px !important; font-size:15px !important;
+}
+.themeToggle:hover{background:#1e293b !important}
+body.dark-mode{background:linear-gradient(180deg,#020617 0%,#0f172a 100%) !important;color:#e5e7eb !important}
+body.dark-mode .vmp-notas-screen{background:#0f172a !important}
+body.dark-mode .vmp-notas-wrap,body.dark-mode .vmp-back-bar{background:#0f172a !important}
+body.dark-mode .vmp-back-btn{background:#1e293b !important;color:#e5e7eb !important;border-color:#475569 !important}
+body.dark-mode .vmp-back-btn:hover{background:#334155 !important}
+@media(max-width:760px){.themeToggle{right:10px;bottom:10px;font-size:14px !important}}
+
 .vmp-dgt-link-box{display:flex;align-items:center;justify-content:center;margin:4px 0 18px}
 .vmp-dgt-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;background:#0f172a;color:#fff;border-radius:999px;padding:10px 16px;font-size:15px;font-weight:850;box-shadow:0 8px 18px rgba(15,23,42,.12)}
 .vmp-dgt-link:hover{filter:brightness(1.08)}
@@ -118,12 +134,12 @@ body.dark-mode .oficial-firma{
 @media(max-width:760px){
   .oficial-firma{right:7px;bottom:5px;font-size:8px}
 }
-body:has(.themeToggle) .oficial-firma{bottom:66px}
-}
+body.con-theme-toggle .oficial-firma{bottom:66px}
 
 </style>
 </head>
-<body>
+<body class="con-theme-toggle">
+<button id="themeToggle" class="themeToggle" type="button">🌙 Noche</button>
 
     <div class="vmp-notas-screen">
     <div class="vmp-back-bar">
@@ -208,5 +224,25 @@ body:has(.themeToggle) .oficial-firma{bottom:66px}
       </div>
     </div>
   <div class="oficial-firma">OFICIAL 46244143</div>
+
+<script>
+function initThemeToggle(){
+  const btn = document.getElementById("themeToggle");
+  if(!btn) return;
+  const savedTheme = localStorage.getItem("temaAppDGT") || "dia";
+  function applyTheme(theme){
+    const dark = theme === "noche";
+    document.body.classList.toggle("dark-mode", dark);
+    btn.textContent = dark ? "🌙 Noche" : "☀️ Día";
+    localStorage.setItem("temaAppDGT", theme);
+  }
+  applyTheme(savedTheme);
+  btn.addEventListener("click", ()=>{
+    const next = document.body.classList.contains("dark-mode") ? "dia" : "noche";
+    applyTheme(next);
+  });
+}
+initThemeToggle();
+</script>
 </body>
 </html>
