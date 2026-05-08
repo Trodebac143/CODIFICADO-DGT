@@ -1168,6 +1168,21 @@ function applyOperationalOverlays(record){
   if(!record) return null;
   const out = {...record};
 
+  // PERMISOS: privación judicial ya cumplida, pena de 2 años o más.
+  // Criterio operativo: no se ejerce acción penal por art. 384 CP si la pena ya está cumplida.
+  if(
+    state.materia === "PERMISOS" &&
+    state.permisos.tipo === "SIN PERMISO" &&
+    state.permisos.detalle === "PRIVACIÓN JUDICIAL" &&
+    state.permisos.judicial === "FUERA DEL PLAZO DE PENA" &&
+    state.permisos.judicialPena === "PENA DE 2 AÑOS O MÁS"
+  ){
+    out.alerta_penal = "NO";
+    out.referencia_penal = "—";
+    out.accion_prioritaria = "No se ejerce la acción penal. Procede denuncia administrativa.";
+    out.comentario_operativo = "No procede art. 384 CP si la pena de privación ya está cumplida. La mera indicación en sentencia de que debe realizar curso de sensibilización/reeducación para recuperar la autorización no convierte automáticamente la conducción posterior en delito de desobediencia.";
+  }
+
   if(state.materia === "ALCOHOL"){
     const isVmpEpac = state.alcohol.vehiculo === "BICIS / VMP / EPAC";
 
