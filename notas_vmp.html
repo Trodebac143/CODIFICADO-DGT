@@ -10,8 +10,8 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-ser
 /* ===== FICHA NOTAS VMPs - NUEVO DISEÑO ===== */
 .vmp-notas-screen{padding:18px;background:#f8fafc}
 .vmp-notas-wrap{max-width:1100px;margin:0 auto}
-.vmp-notas-title{text-align:center;font-size:34px;line-height:1.1;font-weight:950;margin:0 0 8px;color:#0f172a;text-transform:uppercase}
-.vmp-notas-subtitle{text-align:center;font-size:19px;font-weight:750;color:#334155;margin:0 0 18px}
+.vmp-notas-title{text-align:center;font-size:36px;line-height:1.1;font-weight:950;margin:0 0 8px;color:#0f172a;text-transform:uppercase}
+.vmp-notas-subtitle{text-align:center;font-size:20px;font-weight:750;color:#334155;margin:0 0 18px}
 .vmp-type-list{display:flex;flex-direction:column;gap:13px;margin-bottom:18px}
 .vmp-type-card{border-radius:18px;padding:12px 20px;min-height:96px;display:grid;grid-template-columns:92px 1fr;align-items:center;gap:16px;color:#fff;box-shadow:0 10px 22px rgba(15,23,42,.10)}
 .vmp-type-card.vmp-heavy{background:linear-gradient(90deg,#6d28d9,#7c3aed)}
@@ -27,20 +27,23 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-ser
 .vmp-type-icon.light .vmp-type-badge{background:#047857}
 .vmp-type-icon.wide .scoot{transform:translateX(1px) rotate(4deg)}
 .vmp-type-icon.wide .vmp-type-badge{background:#b91c1c}
-.vmp-type-title{font-size:25px;line-height:1.05;font-weight:950;margin-bottom:4px;text-transform:uppercase}
-.vmp-type-text{font-size:18px;line-height:1.28;font-weight:750}
+.vmp-type-title{font-size:27px;line-height:1.05;font-weight:950;margin-bottom:4px;text-transform:uppercase}
+.vmp-type-text{font-size:19px;line-height:1.28;font-weight:750}
 .vmp-note-box{background:#fff;border:1px solid #dbe4ef;border-radius:20px;padding:18px;margin:14px 0;box-shadow:0 8px 20px rgba(15,23,42,.055)}
-.vmp-note-box h3{margin:0 0 12px;font-size:24px;color:#0f172a}
+.vmp-note-box h3{margin:0 0 12px;font-size:26px;color:#0f172a}
 .vmp-important{background:#fff7ed;border-left:7px solid #ea580c}
 .vmp-danger{background:#fff1f2;border-left:7px solid #dc2626}
 .vmp-note-list{margin:8px 0 0;padding-left:22px}
-.vmp-note-list li{margin:7px 0;font-size:18px}
+.vmp-note-list li{margin:8px 0;font-size:19px}
 .vmp-table-wrap{overflow:auto;border:1px solid #dbe4ef;border-radius:16px}
 .vmp-tech-table{width:100%;border-collapse:collapse;background:#fff}
-.vmp-tech-table th{background:#111827;color:#fff;text-align:left;padding:11px;font-size:15px;white-space:nowrap}
-.vmp-tech-table td{border-bottom:1px solid #e5e7eb;padding:11px;vertical-align:top;font-size:16px}
+.vmp-tech-table th{background:#111827;color:#fff;text-align:left;padding:13px;font-size:17px;white-space:nowrap}
+.vmp-tech-table td{border-bottom:1px solid #e5e7eb;padding:13px;vertical-align:top;font-size:17px}
 .vmp-tech-table tr:nth-child(even) td{background:#f8fafc}
-.vmp-code-pill{display:inline-block;background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:999px;padding:5px 10px;font-weight:950;white-space:nowrap}
+.vmp-code-pill{display:inline-block;background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:999px;padding:6px 11px;font-size:16px;font-weight:950;white-space:nowrap}
+.vmp-tech-code-header{display:flex;align-items:center;justify-content:flex-start;margin:14px 0 12px;color:#0f172a}
+.vmp-tech-code-header .vmp-code-pill{font-size:19px}
+body.dark-mode .vmp-tech-code-header{color:#f8fafc}
 body.dark-mode .vmp-notas-screen{background:#0f172a}
 body.dark-mode .vmp-notas-title{color:#f8fafc}
 body.dark-mode .vmp-notas-subtitle{color:#cbd5e1}
@@ -69,7 +72,7 @@ body.dark-mode .vmp-back-btn:hover{background:#334155 !important}
 @media(max-width:760px){.themeToggle{right:10px;bottom:10px;font-size:14px !important}}
 
 .vmp-dgt-link-box{display:flex;align-items:center;justify-content:center;margin:4px 0 18px}
-.vmp-dgt-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;background:#0f172a;color:#fff;border-radius:999px;padding:10px 16px;font-size:15px;font-weight:850;box-shadow:0 8px 18px rgba(15,23,42,.12)}
+.vmp-dgt-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;background:#0f172a;color:#fff;border-radius:999px;padding:11px 18px;font-size:16px;font-weight:850;box-shadow:0 8px 18px rgba(15,23,42,.12)}
 .vmp-dgt-link:hover{filter:brightness(1.08)}
 body.dark-mode .vmp-dgt-link{background:#e5e7eb;color:#0f172a}
 @media(max-width:760px){.vmp-notas-screen{padding:12px}.vmp-notas-title{font-size:25px}.vmp-notas-subtitle{font-size:16px}.vmp-type-card{grid-template-columns:66px 1fr;gap:12px;padding:11px 14px;min-height:86px}.vmp-type-icon{width:50px;height:50px;font-size:28px}.vmp-type-icon.heavy{width:60px;height:60px;font-size:34px}.vmp-type-icon .vmp-type-badge{font-size:9px;padding:2px 6px;right:-5px;bottom:-4px}.vmp-type-title{font-size:19px}.vmp-type-text{font-size:15px}.vmp-note-box{padding:14px;border-radius:16px}.vmp-note-box h3{font-size:21px}.vmp-note-list li{font-size:16px}.vmp-tech-table th,.vmp-tech-table td{font-size:14px;padding:9px}}
@@ -188,30 +191,6 @@ body.con-theme-toggle .oficial-firma{bottom:66px}
           </ul>
         </div>
 
-        <div class="vmp-note-box">
-          <h3>Requisitos técnicos — Anexo XXI del RGV (Obligatorio en VMPs con certificado de circulación desde 22/01/2024)</h3>
-          <ul class="vmp-note-list">
-            <li><strong>VEH 22-B-2.5D</strong> · 500 / 250 €. Incumplimiento muy grave: manipulación de limitación de velocidad para aumentarla, modificación estructural u otros supuestos de mayor gravedad.</li>
-            <li><strong>VEH 22-B-2.5E</strong> · 200 / 100 €. Incumplimiento grave: no dispone o no funciona sistema de iluminación, ruedas u otros elementos técnicos relevantes.</li>
-            <li><strong>VEH 22-B-2.5F</strong> · 100 / 50 €. Incumplimiento leve: ausencia de dispositivo sonoro, pata de cabra u otros elementos leves.</li>
-          </ul>
-          <div class="vmp-table-wrap">
-            <table class="vmp-tech-table">
-              <thead><tr><th>Artículo / opción</th><th>Requisito concreto</th><th>Importe</th></tr></thead>
-              <tbody>
-                <tr><td><span class="vmp-code-pill">RGV 7-3-5B</span></td><td><strong>2.6</strong> No disponer de dos frenos independientes, pudiendo ser accionados desde el mismo actuador.</td><td>200 / 100 €</td></tr>
-                <tr><td><span class="vmp-code-pill">RGV 7-3-5B</span></td><td><strong>2.7</strong> No disponer de sistema de estabilización en aparcamiento.</td><td>200 / 100 €</td></tr>
-                <tr><td><span class="vmp-code-pill">RGV 7-3-5B</span></td><td><strong>2.8</strong> Utilización de neumáticos lisos o tipo slick.</td><td>200 / 100 €</td></tr>
-                <tr><td><span class="vmp-code-pill">RGV 7-3-5B</span></td><td><strong>2.9</strong> Catadióptricos frontal blanco, en ambos laterales blanco o color amarillo auto, y trasero rojo.</td><td>200 / 100 €</td></tr>
-                <tr><td><span class="vmp-code-pill">RGV 7-3-5B</span></td><td><strong>2.11</strong> No estar equipado de un avisador acústico integrado en el propio vehículo.</td><td>200 / 100 €</td></tr>
-                <tr><td><span class="vmp-code-pill">RGV 7-3-5B</span></td><td><strong>2.15</strong> No llevar instalado un visualizador integrado en el propio vehículo, nivel de batería y velocidad instantánea.</td><td>200 / 100 €</td></tr>
-                <tr><td><span class="vmp-code-pill">RGV 7-3-5B</span></td><td><strong>2.23.1</strong> Carecer de placa de marcaje de fábrica único siendo la compra posterior a 12/01/2022.</td><td>200 / 100 €</td></tr>
-                <tr><td><span class="vmp-code-pill">RGV 7-3-5B</span></td><td><strong>2.24</strong> Carecer de portaidentificador, normalmente bajo luz trasera roja.</td><td>200 / 100 €</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
         <div class="vmp-note-box vmp-danger">
           <h3>No denunciar simultáneamente</h3>
           <ul class="vmp-note-list">
@@ -221,6 +200,34 @@ body.con-theme-toggle .oficial-firma{bottom:66px}
             <li>Primero fija la infracción base y evita duplicar hechos derivados de la misma carencia.</li>
           </ul>
         </div>
+
+        <div class="vmp-note-box">
+          <h3>Requisitos técnicos — Anexo XXI del RGV (Obligatorio en VMPs con certificado de circulación desde 22/01/2024)</h3>
+          <ul class="vmp-note-list">
+            <li><strong>VEH 22-B-2.5D</strong> · 500 / 250 €. Incumplimiento muy grave: manipulación de limitación de velocidad para aumentarla, modificación estructural u otros supuestos de mayor gravedad.</li>
+            <li><strong>VEH 22-B-2.5E</strong> · 200 / 100 €. Incumplimiento grave: no dispone o no funciona sistema de iluminación, ruedas u otros elementos técnicos relevantes.</li>
+            <li><strong>VEH 22-B-2.5F</strong> · 100 / 50 €. Incumplimiento leve: ausencia de dispositivo sonoro, pata de cabra u otros elementos leves.</li>
+          </ul>
+          <div class="vmp-tech-code-header">
+            <span class="vmp-code-pill">RGV-7-3-5B</span>
+          </div>
+          <div class="vmp-table-wrap">
+            <table class="vmp-tech-table">
+              <thead><tr><th>Opción Anexo XXI</th><th>Requisito concreto</th><th>Importe</th></tr></thead>
+              <tbody>
+                <tr><td><strong>2.6</strong></td><td>No disponer de dos frenos independientes, pudiendo ser accionados desde el mismo actuador.</td><td>200 / 100 €</td></tr>
+                <tr><td><strong>2.8</strong></td><td>Utilización de neumáticos lisos o tipo slick.</td><td>200 / 100 €</td></tr>
+                <tr><td><strong>2.9</strong></td><td>Catadióptricos frontal blanco, en ambos laterales blanco o color amarillo auto, y trasero rojo.</td><td>200 / 100 €</td></tr>
+                <tr><td><strong>2.11</strong></td><td>No estar equipado de un avisador acústico integrado en el propio vehículo.</td><td>200 / 100 €</td></tr>
+                <tr><td><strong>2.15</strong></td><td>No llevar instalado un visualizador integrado en el propio vehículo, nivel de batería y velocidad instantánea.</td><td>200 / 100 €</td></tr>
+                <tr><td><strong>2.23.1</strong></td><td>Carecer de placa de marcaje de fábrica único siendo la compra posterior a 12/01/2022.</td><td>200 / 100 €</td></tr>
+                <tr><td><strong>2.24</strong></td><td>Carecer de portaidentificador, normalmente bajo luz trasera roja.</td><td>200 / 100 €</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+
       </div>
     </div>
   <div class="oficial-firma">OFICIAL 46244143</div>
