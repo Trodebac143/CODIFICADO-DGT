@@ -1,5 +1,5 @@
 window.DOCUMENTOS_INDEX = {
-  "actualizado": "30/05/2026 17:51",
+  "actualizado": "30/05/2026 18:04",
   "documentos": [
     {
       "titulo": "Acta Notificacion Perdida De Vigencia",
@@ -12,6 +12,13 @@ window.DOCUMENTOS_INDEX = {
       "titulo": "Consulta Inmovilizacion Por Presencia De Drogas En El Organismo",
       "archivo": "documentos/CONSULTA INMOVILIZACION POR PRESENCIA DE DROGAS EN EL ORGANISMO.pdf",
       "nombre": "CONSULTA INMOVILIZACION POR PRESENCIA DE DROGAS EN EL ORGANISMO.pdf",
+      "tipo": "PDF",
+      "descripcion": "Documento de referencia operativo."
+    },
+    {
+      "titulo": "Instruccion Trafico Itv Estacionado",
+      "archivo": "documentos/INSTRUCCION-TRAFICO-ITV-ESTACIONADO.pdf",
+      "nombre": "INSTRUCCION-TRAFICO-ITV-ESTACIONADO.pdf",
       "tipo": "PDF",
       "descripcion": "Documento de referencia operativo."
     },
