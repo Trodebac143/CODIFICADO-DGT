@@ -1,0 +1,21 @@
+ACTUALIZACIÓN REALIZADA - DOCUMENTOS DE REFERENCIA
+
+Qué se ha cambiado:
+1. apuntes.html ahora carga automáticamente el listado de documentos desde documentos-index.js / documentos-index.json.
+2. visor_documento.html ya no depende solo de una lista cerrada de PDFs: usa el índice generado.
+3. Se añade generar_indice_documentos.py en la raíz de la app.
+4. Se añaden documentos-index.json y documentos-index.js ya generados con los documentos actuales.
+
+Cómo usarlo:
+1. Añade o quita archivos dentro de la carpeta documentos.
+2. Desde la carpeta principal de la app ejecuta:
+   python generar_indice_documentos.py
+
+Eso actualiza:
+- documentos-index.json
+- documentos-index.js
+
+Notas:
+- Se ha respetado la carpeta existente: documentos
+- No se ha tocado la base CSV de infracciones.
+- No se ha modificado la navegación principal ni notas_vmp.html.

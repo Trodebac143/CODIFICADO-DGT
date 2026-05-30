@@ -182,29 +182,19 @@ body.con-theme-toggle .oficial-firma{bottom:66px}
 
     <div class="panel">
       <div class="section">
-        <h2>Permisos de conducir</h2>
+        <h2>Documentos disponibles</h2>
       </div>
 
-      <div class="doc-grid">
+      <div class="doc-grid" id="lista-documentos">
         <article class="doc-card">
-          <h3>Acta notificación pérdida de vigencia</h3>
-          <p>Acta de notificación y retirada del permiso/licencia de conducción.</p>
-          <a class="button primary" href="visor_documento.html?doc=acta_notificacion_perdida_vigencia.pdf&from=apuntes">
-            Abrir documento
-          </a>
-        </article>
-
-        <article class="doc-card">
-          <h3>Pérdida de vigencia / suspensión judicial</h3>
-          <p>Chuleta operativa sobre pérdida de vigencia, suspensión judicial y recuperación del permiso.</p>
-          <a class="button primary" href="visor_documento.html?doc=perdidas_vigencia_suspension.pdf&from=apuntes">
-            Abrir documento
-          </a>
+          <h3>Cargando documentos...</h3>
+          <p>Preparando el índice de documentos de referencia.</p>
         </article>
       </div>
     </div>
   </div>
 
+<script src="documentos-index.js"></script>
 <script>
 (function(){
  const btn=document.getElementById("themeToggle");
@@ -214,6 +204,83 @@ body.con-theme-toggle .oficial-firma{bottom:66px}
  btn.addEventListener("click",()=>apply(document.body.classList.contains("dark-mode")?"dia":"noche"));
 })();
 </script>
+<script>
+(function(){
+  const contenedor = document.getElementById("lista-documentos");
+
+  function escapar(texto){
+    return String(texto || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function pintarDocumentos(datos){
+    if(!contenedor) return;
+
+    const documentos = datos && Array.isArray(datos.documentos) ? datos.documentos : [];
+    contenedor.innerHTML = "";
+
+    if(documentos.length === 0){
+      contenedor.innerHTML = `
+        <article class="doc-card">
+          <h3>No hay documentos disponibles</h3>
+          <p>Añade archivos a la carpeta documentos y ejecuta generar_indice_documentos.py.</p>
+        </article>
+      `;
+      return;
+    }
+
+    documentos.forEach(function(doc){
+      const nombre = doc.nombre || (doc.archivo || "").split("/").pop();
+      const titulo = doc.titulo || nombre || "Documento";
+      const tipo = doc.tipo || "DOC";
+      const descripcion = doc.descripcion || "Documento de referencia operativo.";
+      const urlVisor = "visor_documento.html?doc=" + encodeURIComponent(nombre) + "&from=apuntes";
+
+      const tarjeta = document.createElement("article");
+      tarjeta.className = "doc-card";
+      tarjeta.innerHTML = `
+        <h3>${escapar(titulo)}</h3>
+        <p>${escapar(descripcion)} · ${escapar(tipo)}</p>
+        <a class="button primary" href="${urlVisor}">
+          Abrir documento
+        </a>
+      `;
+      contenedor.appendChild(tarjeta);
+    });
+  }
+
+  async function cargarIndice(){
+    if(window.DOCUMENTOS_INDEX){
+      pintarDocumentos(window.DOCUMENTOS_INDEX);
+      return;
+    }
+
+    try{
+      const respuesta = await fetch("documentos-index.json", {cache:"no-store"});
+      if(!respuesta.ok) throw new Error("No se pudo cargar documentos-index.json");
+      const datos = await respuesta.json();
+      pintarDocumentos(datos);
+    }catch(error){
+      console.error(error);
+      if(contenedor){
+        contenedor.innerHTML = `
+          <article class="doc-card">
+            <h3>No se ha podido cargar el índice</h3>
+            <p>Ejecuta python generar_indice_documentos.py desde la carpeta principal de la app.</p>
+          </article>
+        `;
+      }
+    }
+  }
+
+  cargarIndice();
+})();
+</script>
+
   <div class="oficial-firma">OFICIAL 46244143</div>
 </body>
 </html>

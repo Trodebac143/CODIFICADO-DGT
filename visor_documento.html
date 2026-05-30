@@ -111,26 +111,46 @@ body.con-theme-toggle .oficial-firma{bottom:66px}
   <div class="toolbar">
     <button class="primary" onclick="window.location.href='index.html'">⬅ Pantalla principal</button>
     <button class="secondary" onclick="window.location.href='apuntes.html'">📄 Apuntes de referencia</button>
-    <a id="openExternal" class="secondary" target="_blank" rel="noopener noreferrer">Abrir PDF en pestaña</a>
+    <a id="openExternal" class="secondary" target="_blank" rel="noopener noreferrer">Abrir documento en pestaña</a>
     <span class="title" id="docTitle">Documento</span>
   </div>
 
   <iframe id="pdfFrame" title="Documento PDF"></iframe>
 
+  <script src="documentos-index.js"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
-    const allowedDocs = {
-      "acta_notificacion_perdida_vigencia.pdf": "Acta notificación pérdida de vigencia",
-      "perdidas_vigencia_suspension.pdf": "Pérdida de vigencia / suspensión judicial"
+    const requested = params.get("doc") || "";
+
+    const fallbackDocs = {
+      "acta_notificacion_perdida_vigencia.pdf": {
+        titulo: "Acta notificación pérdida de vigencia",
+        archivo: "documentos/acta_notificacion_perdida_vigencia.pdf",
+        nombre: "acta_notificacion_perdida_vigencia.pdf"
+      },
+      "perdidas_vigencia_suspension.pdf": {
+        titulo: "Pérdida de vigencia / suspensión judicial",
+        archivo: "documentos/perdidas_vigencia_suspension.pdf",
+        nombre: "perdidas_vigencia_suspension.pdf"
+      }
     };
 
-    const requested = params.get("doc") || "";
-    const doc = allowedDocs[requested] ? requested : "perdidas_vigencia_suspension.pdf";
-    const src = "documentos/" + doc;
+    function buscarDocumentoEnIndice(nombre){
+      const indice = window.DOCUMENTOS_INDEX;
+      if(indice && Array.isArray(indice.documentos)){
+        return indice.documentos.find(function(doc){
+          return doc.nombre === nombre || (doc.archivo || "").split("/").pop() === nombre;
+        });
+      }
+      return null;
+    }
 
-    document.getElementById("docTitle").textContent = allowedDocs[doc];
-    document.getElementById("pdfFrame").src = src;
-    document.getElementById("openExternal").href = src;
+    const docEncontrado = buscarDocumentoEnIndice(requested);
+    const doc = docEncontrado || fallbackDocs[requested] || fallbackDocs["perdidas_vigencia_suspension.pdf"];
+
+    document.getElementById("docTitle").textContent = doc.titulo || doc.nombre || "Documento";
+    document.getElementById("pdfFrame").src = doc.archivo;
+    document.getElementById("openExternal").href = doc.archivo;
   </script>
   <div class="oficial-firma">OFICIAL 46244143</div>
 

@@ -1,0 +1,40 @@
+window.DOCUMENTOS_INDEX = {
+  "actualizado": "30/05/2026 17:51",
+  "documentos": [
+    {
+      "titulo": "Acta Notificacion Perdida De Vigencia",
+      "archivo": "documentos/ACTA NOTIFICACION PERDIDA DE VIGENCIA.pdf",
+      "nombre": "ACTA NOTIFICACION PERDIDA DE VIGENCIA.pdf",
+      "tipo": "PDF",
+      "descripcion": "Documento de referencia operativo."
+    },
+    {
+      "titulo": "Consulta Inmovilizacion Por Presencia De Drogas En El Organismo",
+      "archivo": "documentos/CONSULTA INMOVILIZACION POR PRESENCIA DE DROGAS EN EL ORGANISMO.pdf",
+      "nombre": "CONSULTA INMOVILIZACION POR PRESENCIA DE DROGAS EN EL ORGANISMO.pdf",
+      "tipo": "PDF",
+      "descripcion": "Documento de referencia operativo."
+    },
+    {
+      "titulo": "InstruccióN Sanc 2026 13 VehíCulos De Movilidad Personal",
+      "archivo": "documentos/Instrucción_SANC_2026_13_Vehículos_de_Movilidad_Personal.pdf",
+      "nombre": "Instrucción_SANC_2026_13_Vehículos_de_Movilidad_Personal.pdf",
+      "tipo": "PDF",
+      "descripcion": "Documento de referencia operativo."
+    },
+    {
+      "titulo": "Perdida De Vigencia Y Suspension Judicial",
+      "archivo": "documentos/PERDIDA DE VIGENCIA Y SUSPENSION JUDICIAL.pdf",
+      "nombre": "PERDIDA DE VIGENCIA Y SUSPENSION JUDICIAL.pdf",
+      "tipo": "PDF",
+      "descripcion": "Documento de referencia operativo."
+    },
+    {
+      "titulo": "Sobrre Detenciones Y Asistencia Letrada",
+      "archivo": "documentos/SOBRRE DETENCIONES Y ASISTENCIA LETRADA.pdf",
+      "nombre": "SOBRRE DETENCIONES Y ASISTENCIA LETRADA.pdf",
+      "tipo": "PDF",
+      "descripcion": "Documento de referencia operativo."
+    }
+  ]
+};
