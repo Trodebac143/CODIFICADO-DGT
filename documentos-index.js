@@ -1,5 +1,5 @@
 window.DOCUMENTOS_INDEX = {
-  "actualizado": "30/05/2026 18:04",
+  "actualizado": "30/05/2026 19:37",
   "documentos": [
     {
       "titulo": "Acta Notificacion Perdida De Vigencia",
