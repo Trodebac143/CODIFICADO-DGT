@@ -1,5 +1,5 @@
 {
-  "actualizado": "30/05/2026 19:37",
+  "actualizado": "05/06/2026 20:57",
   "documentos": [
     {
       "titulo": "Acta Notificacion Perdida De Vigencia",
@@ -12,6 +12,13 @@
       "titulo": "Consulta Inmovilizacion Por Presencia De Drogas En El Organismo",
       "archivo": "documentos/CONSULTA INMOVILIZACION POR PRESENCIA DE DROGAS EN EL ORGANISMO.pdf",
       "nombre": "CONSULTA INMOVILIZACION POR PRESENCIA DE DROGAS EN EL ORGANISMO.pdf",
+      "tipo": "PDF",
+      "descripcion": "Documento de referencia operativo."
+    },
+    {
+      "titulo": "Guia Operativa Vmp Vpl",
+      "archivo": "documentos/GUIA OPERATIVA VMP-VPL.pdf",
+      "nombre": "GUIA OPERATIVA VMP-VPL.pdf",
       "tipo": "PDF",
       "descripcion": "Documento de referencia operativo."
     },
